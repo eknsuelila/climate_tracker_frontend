@@ -1,12 +1,18 @@
-import Home from "./home/home"
-import Navbar from "./navbar/navbar"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./home/home";
+import Navbar from "./navbar/navbar";
+import Login from "./login/login";
 
-const App = ()=>{
-    return <main>
-        <Navbar></Navbar>
-        <Home></Home>
-        
-     </main>
-}
+const App = () => {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
+  );
+};
 
-export default App
+export default App;
