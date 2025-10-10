@@ -1,6 +1,5 @@
-// src/LoginPage.jsx
-
 import React, { useState } from 'react';
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   // State Management
@@ -50,10 +49,10 @@ const LoginPage = () => {
           />
         </div>
         <button type="submit">Login</button>
-        <p>
-        <a href="/password-reset">Forgot Password?</a>
-      </p>
       </form>
+      <p>
+        <Link to="/reset">Forgot Password?</Link>
+      </p>
     </div>
   );
 };
