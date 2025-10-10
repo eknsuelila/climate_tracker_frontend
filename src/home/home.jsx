@@ -1,9 +1,15 @@
-
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 const Home = ()=>{
-    return   <div className="h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600">
-       Home
-      </h1>
+    return   <div>
+        <Container>
+      <Row>
+        <Col>1 of 1</Col>
+        <Col>ee</Col>
+      </Row>
+    </Container>
+    
     </div>
 }
 
