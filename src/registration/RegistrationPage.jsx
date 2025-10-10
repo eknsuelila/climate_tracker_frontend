@@ -25,44 +25,53 @@ const RegistrationPage = () => {
   };
 
   return (
-    <div className="registration-container">
-      <h2>Create an Account</h2>
-      <form onSubmit={handleSubmit} className="registration-form">
-        <div className="form-group">
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="register-btn">Register</button>
-      </form>
+    <div className="registration-page">
+      <div className="registration-card">
+        <h2>Create an Account</h2>
+        <p>Join us today! It takes only a few steps.</p>
+        <form onSubmit={handleSubmit} className="registration-form">
+          <div className="form-group">
+            <label htmlFor="username">Username:</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
+          <button type="submit" className="register-btn">Register</button>
+        </form>
+        <a href="/login" className="text-link">
+          Already have an account? Login
+        </a>
+      </div>
     </div>
   );
 };
