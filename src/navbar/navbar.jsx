@@ -4,7 +4,9 @@ const Navbar = () => {
   return (
     <nav style={{ padding: "10px", background: "#eee" }}>
       <Link to="/" style={{ marginRight: "10px" }}>Home</Link>
-      <Link to="/login">Login</Link>
+      <Link to="/login" style={{ marginRight: "10px" }}>Login</Link>
+      <Link to="/register">Register</Link>
+      
     </nav>
   );
 };
