@@ -19,7 +19,7 @@ const App = () => {
       <Route path="/reset" element={<PasswordResetPage />} />
       </Routes>
 
-      {/* ✅ Footer appears on all pages */}
+      {/* ✅ Footer appears on all0es */}
       <Footer />
     </Router>
   );

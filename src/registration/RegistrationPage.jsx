@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './RegistrationPage.css';
 
 const RegistrationPage = () => {
   // State Management
@@ -23,12 +24,11 @@ const RegistrationPage = () => {
     alert('Check the console for the registration data.');
   };
 
-  // JSX Markup
   return (
-    <div>
+    <div className="registration-container">
       <h2>Create an Account</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit} className="registration-form">
+        <div className="form-group">
           <label htmlFor="username">Username:</label>
           <input
             type="text"
@@ -36,9 +36,10 @@ const RegistrationPage = () => {
             name="username"
             value={formData.username}
             onChange={handleChange}
+            required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -46,9 +47,10 @@ const RegistrationPage = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -56,9 +58,10 @@ const RegistrationPage = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
+            required
           />
         </div>
-        <button type="submit">Register</button>
+        <button type="submit" className="register-btn">Register</button>
       </form>
     </div>
   );
