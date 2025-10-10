@@ -1,0 +1,77 @@
+.home-page {
+  background-color: #1c232b;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+}
+
+/* HERO SECTION */
+.hero-section {
+  background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb'); /* replace with your BC image */
+  background-size: cover;
+  background-position: center;
+  padding: 100px 0;
+  position: relative;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.hero-container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-text h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.hero-text p {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* AI INSIGHT CARD */
+.ai-card {
+  background: #f8f9fa;
+  color: #000;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.ai-card h6 {
+  letter-spacing: 0.5px;
+}
+
+/* FEATURED EVENTS */
+.featured-section {
+  background-color: #2a3039;
+  padding: 50px 0;
+  margin-top: 40px;
+  border-radius: 20px 20px 0 0;
+}
+
+.event-card {
+  background-color: #1f262e;
+  color: white;
+  border: 1px solid #343a40;
+  text-align: center;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.event-card:hover {
+  border-color: #3ebfff;
+  transform: translateY(-3px);
+}
