@@ -1,5 +1,3 @@
-// src/registration/RegistrationPage.jsx
-
 import React, { useState } from 'react';
 
 const RegistrationPage = () => {
