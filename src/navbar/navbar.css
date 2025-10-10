@@ -1,9 +1,42 @@
 .navbar-main {
-    padding: "10px";
-    background-color: whitesmoke; 
-    padding-top: 2%;
-    padding-bottom: 2%;
-    height: max-content;
-    padding-left: .5%;
-    padding-right: .5%;
+  background-color: #1c232b; /* dark blue-gray background */
+  color: white;
+  font-family: 'Poppins', sans-serif;
+}
+
+.navbar-logo {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.logo-icon {
+  margin-right: 6px;
+  font-size: 1.4rem;
+}
+
+.highlight {
+  color: #3ebfff; /* blue accent */
+}
+
+.nav-links .nav-item {
+  color: white;
+  text-decoration: none;
+  margin: 0 1rem;
+  transition: color 0.3s;
+  font-weight: 500;
+}
+
+.nav-links .nav-item:hover {
+  color: #3ebfff;
+}
+
+.nav-item.login {
+  color: #3ebfff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav-item.login:hover {
+  text-decoration: underline;
 }
