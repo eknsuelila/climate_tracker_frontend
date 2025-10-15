@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./home/home";
 import Navbar from "./navbar/navbar";
 import Footer from "./footer/footer";
@@ -21,12 +22,36 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/reset" element={<PasswordResetPage />} />
-        <Route path="/submit-event" element={<Event />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/map" element={<Map />} />
-        <Route path="/timeline" element={<TimelinePage />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/edit-profile" element={<EditProfile />} /> {/* ✅ Add EditProfile route */}
+        <Route path="/submit-event" element={
+          <ProtectedRoute>
+            <Event />
+          </ProtectedRoute>
+        } />
+        <Route path="/analytics" element={
+          <ProtectedRoute>
+            <Analytics />
+          </ProtectedRoute>
+        } />
+        <Route path="/map" element={
+          <ProtectedRoute>
+            <Map />
+          </ProtectedRoute>
+        } />
+        <Route path="/timeline" element={
+          <ProtectedRoute>
+            <TimelinePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/edit-profile" element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        } />
       </Routes>
       <Footer />
     </Router>

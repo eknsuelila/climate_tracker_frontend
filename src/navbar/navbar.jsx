@@ -1,9 +1,16 @@
 import React from "react";
+import { useAuth } from "../service/auth.jsx";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import "./navbar.css";
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div className="navbar-main shadow-sm py-3 px-4">
       <Container fluid>
@@ -54,15 +61,24 @@ const Navbar = () => {
               </Button>
             </NavLink>
 
-            <NavLink to="/login" className="nav-item login">
-              LOGIN
-            </NavLink>
-
-            <NavLink to="/profile">
-              <Button variant="outline-info" className="rounded-pill px-3">
-                PROFILE
+            {user ? (
+              <div className="d-flex align-items-center gap-3">
+                <NavLink to="/profile">
+                  <Button variant="outline-info" className="rounded-pill px-3">
+                    PROFILE
+                  </Button>
+                </NavLink>
+                <Button variant="outline-secondary" onClick={handleLogout} className="rounded-pill px-3">
+                  LOGOUT
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline-secondary" className="rounded-pill px-3">
+                <NavLink to="/login" className="text-decoration-none text-reset">
+                  LOGIN
+                </NavLink>
               </Button>
-            </NavLink>
+            )}
           </Col>
         </Row>
       </Container>

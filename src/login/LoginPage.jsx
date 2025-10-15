@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
+import { useAuth } from "../service/auth.jsx";
 import "./login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -39,11 +41,12 @@ const Login = () => {
         setMessageType("error");
       } else {
         localStorage.setItem("access_token", data.access_token);
+        login(data.access_token); // Update global auth state
         setMessage("Login successful. Redirecting...");
         setMessageType("success");
         setTimeout(() => navigate("/"), 600);
       }
-    } catch (err) {
+    } catch {
       setMessage("Network error. Please try again.");
       setMessageType("error");
     } finally {
