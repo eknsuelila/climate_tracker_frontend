@@ -1,0 +1,51 @@
+.timeline-page {
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1c232b 40%, #2b3947 100%);
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+}
+
+.timeline-page h1 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.timeline-event {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px 25px;
+  border-left: 4px solid #17a2b8; /* Bootstrap info color */
+  border-radius: 8px;
+  transition: transform 0.3s, background 0.3s;
+}
+
+.timeline-event:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.timeline-event h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.timeline-event p {
+  margin: 5px 0;
+}
+
+.event-date {
+  font-size: 0.9rem;
+  color: #a0c4db;
+}
