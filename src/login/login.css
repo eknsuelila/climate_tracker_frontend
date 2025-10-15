@@ -59,3 +59,45 @@
   border-color: #3ebfff;
   box-shadow: 0 0 0 0.2rem rgba(62, 191, 255, 0.25);
 }
+
+/* Inline login message styled to match theme */
+.login-message {
+  margin: 12px 0 18px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #3ebfff;
+  background-color: rgba(62, 191, 255, 0.08);
+  color: #1c232b;
+  line-height: 1.3;
+}
+
+.login-message.success {
+  border-color: #3ebfff;
+  background-color: rgba(62, 191, 255, 0.08);
+}
+
+.login-message.error {
+  border-color: #ffb3ab;
+  background-color: #fff2f0;
+}
+
+.login-message-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.login-message-icon {
+  font-size: 18px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.login-message-content { flex: 1; }
+
+.login-message-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.login-message-body { font-size: 0.95rem; }
