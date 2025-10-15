@@ -1,0 +1,61 @@
+.map-page {
+  padding: 40px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #1c232b 40%, #2b3947 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.map-card {
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  padding: 30px 20px;
+  width: 90%;
+  max-width: 900px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.map-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.map-info {
+  margin-bottom: 25px;
+}
+
+.map-info h2 {
+  color: #ffffff; /* changed from #1c232b to white */
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.map-info p {
+  color: #e0e0e0; /* light grey for better readability */
+  font-size: 1.1rem;
+}
+
+.map-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  border: 3px solid #3ebfff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.map-container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+}
