@@ -1,13 +1,10 @@
 import React from "react";
-import { useAuth } from "../service/auth.jsx";
 import "./profile.css";
 import { NavLink } from "react-router-dom";
 
 const Profile = () => {
-  const { logout } = useAuth();
-  
-  // For now, use placeholder data until you get user data from backend
-  const userData = {
+  // Example user data
+  const user = {
     name: "Taniya Ann Mariya",
     email: "taniya@example.com",
     role: "Full Stack Developer",
@@ -19,18 +16,15 @@ const Profile = () => {
       <h1>My Profile</h1>
       <div className="profile-card">
         <div className="avatar-container">
-          <img src={userData.avatar} alt="Profile Avatar" className="avatar" />
+          <img src={user.avatar} alt="Profile Avatar" className="avatar" />
         </div>
         <div className="profile-info">
-          <h2>{userData.name}</h2>
-          <p><strong>Email:</strong> {userData.email}</p>
-          <p><strong>Role:</strong> {userData.role}</p>
+          <h2>{user.name}</h2>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Role:</strong> {user.role}</p>
           <NavLink to="/edit-profile">
-            <button className="edit-btn rounded-pill">Edit Profile</button>
-          </NavLink>
-          <button className="logout-btn rounded-pill" onClick={logout}>
-            Logout
-          </button>
+  <button className="edit-btn rounded-pill">Edit Profile</button>
+</NavLink>
         </div>
       </div>
     </div>

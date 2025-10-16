@@ -48,38 +48,23 @@
   font-size: 1rem;
 }
 
-.edit-btn, .logout-btn {
-  margin-top: 15px;
-  margin-right: 10px;
+.edit-btn {
+  margin-top: 20px;
   padding: 10px 20px;
   border: 2px solid #3ebfff;
   border-radius: 25px;
   background: transparent;
   color: #3ebfff;
   font-weight: 600;
-  font-size: 0.9rem;
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 120px;
 }
 
 .edit-btn:hover {
   background: #3ebfff;
   color: #1c232b;
   box-shadow: 0 0 10px #3ebfff, 0 0 20px #3ebfff;
-  transform: translateY(-2px);
-}
-
-.logout-btn {
-  border-color: #dc3545;
-  color: #dc3545;
-}
-
-.logout-btn:hover {
-  background: #dc3545;
-  color: white;
-  box-shadow: 0 0 10px #dc3545, 0 0 20px #dc3545;
   transform: translateY(-2px);
 }
 

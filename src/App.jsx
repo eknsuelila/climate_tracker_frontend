@@ -11,7 +11,7 @@ import Analytics from "./analytics/analytics";
 import Map from "./map/map";
 import TimelinePage from "./timeline/timeline";
 import Profile from "./profile/profile";
-import EditProfile from "./profile/editProfile/editProfile"; // ✅ Import EditProfile
+import EditProfile from "./profile/editProfile/editProfile";
 
 const App = () => {
   return (
