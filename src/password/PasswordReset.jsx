@@ -3,16 +3,42 @@ import "./PasswordReset.css";
 
 const PasswordReset = () => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Password reset requested for:", email);
-    alert("If this email is registered, a reset link will be sent to your inbox.");
-    setEmail(""); // Clear field after submission
+
+    if (!email.trim()) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:8000/api/climate/auth/reset_password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        alert("✅ If this email is registered, a password reset link has been sent to your inbox.");
+        setEmail("");
+      } else {
+        const err = await response.json();
+        alert(`❌ ${err.detail || "Failed to send reset link."}`);
+      }
+    } catch (error) {
+      alert("⚠️ Unable to connect to server. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,7 +50,9 @@ const PasswordReset = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="reset-form">
-          <label htmlFor="email" className="reset-label">Email Address</label>
+          <label htmlFor="email" className="reset-label">
+            Email Address
+          </label>
           <input
             type="email"
             id="email"
@@ -35,13 +63,15 @@ const PasswordReset = () => {
             required
           />
 
-          <button type="submit" className="reset-btn">
-            Send Reset Link
+          <button type="submit" className="reset-btn" disabled={loading}>
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
 
         <div className="reset-footer">
-          <a href="/login" className="reset-link">← Back to Login</a>
+          <a href="/login" className="reset-link">
+            ← Back to Login
+          </a>
         </div>
       </div>
     </div>

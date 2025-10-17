@@ -6,6 +6,7 @@ import Footer from "./footer/footer";
 import LoginPage from "./login/LoginPage";
 import RegistrationPage from "./registration/RegistrationPage";
 import PasswordResetPage from "./password/PasswordReset";
+import PasswordUpdate from "./password/PasswordUpdate";
 import Event from "./event/event";
 import Analytics from "./analytics/analytics";
 import Map from "./map/map";
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/reset" element={<PasswordResetPage />} />
+        <Route path="/reset-password" element={<PasswordUpdate/>}/>
         <Route path="/submit-event" element={
           <ProtectedRoute>
             <Event />
