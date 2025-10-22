@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./PasswordReset.css";
 
 const PasswordUpdate = () => {
@@ -15,17 +17,28 @@ const PasswordUpdate = () => {
     const queryParams = new URLSearchParams(location.search);
     const tokenFromURL = queryParams.get("token");
     if (!tokenFromURL) {
-      alert("Invalid or missing token!");
+      toast.error("⚠️ Invalid or missing token!", {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "colored",
+        transition: Bounce,
+      });
       navigate("/login");
+    } else {
+      setToken(tokenFromURL);
     }
-    setToken(tokenFromURL);
   }, [location, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirm) {
-      alert("Passwords do not match!");
+      toast.warn("⚠️ Passwords do not match!", {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "colored",
+        transition: Bounce,
+      });
       return;
     }
 
@@ -33,21 +46,34 @@ const PasswordUpdate = () => {
       setLoading(true);
       const response = await fetch("http://localhost:8000/api/climate/auth/update_password", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, new_password: password }),
       });
 
       if (response.ok) {
-        alert("✅ Password updated successfully! Please login again.");
-        navigate("/login");
+        toast.success("✅ Password updated successfully! Redirecting to login...", {
+          position: "top-right",
+          autoClose: 2500,
+          theme: "colored",
+          transition: Bounce,
+        });
+        setTimeout(() => navigate("/login"), 1000);
       } else {
         const err = await response.json();
-        alert(`❌ ${err.detail || "Failed to update password"}`);
+        toast.error(`❌ ${err.detail || "Failed to update password"}`, {
+          position: "top-right",
+          autoClose: 4000,
+          theme: "colored",
+          transition: Bounce,
+        });
       }
-    } catch (error) {
-      alert("Error connecting to server.");
+    } catch {
+      toast.error("⚠️ Error connecting to server.", {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "colored",
+        transition: Bounce,
+      });
     } finally {
       setLoading(false);
     }
@@ -93,6 +119,19 @@ const PasswordUpdate = () => {
           <a href="/login" className="reset-link">← Back to Login</a>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </div>
   );
 };
