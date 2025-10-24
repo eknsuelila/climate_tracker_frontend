@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { useAuth } from "../service/auth.jsx";
+import { API_ENDPOINTS, apiCall } from "../service/api.js";
 import "./login.css";
 
 const Login = () => {
@@ -28,30 +29,25 @@ const Login = () => {
     setLoading(true);
     setMessage(null);
     setMessageType(null);
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/climate/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        const detail = typeof data?.detail === "string" ? data.detail : "Invalid email or password";
-        setMessage(detail);
-        setMessageType("error");
-      } else {
-        localStorage.setItem("access_token", data.access_token);
-        login(data.access_token); // Update global auth state
-        setMessage("Login successful. Redirecting...");
-        setMessageType("success");
-        setTimeout(() => navigate("/"), 600);
-      }
-    } catch {
-      setMessage("Network error. Please try again.");
+    
+    const { data, success, error } = await apiCall(API_ENDPOINTS.LOGIN, {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+    
+    if (success) {
+      localStorage.setItem("access_token", data.access_token);
+      login(data.access_token); // Update global auth state
+      setMessage("Login successful. Redirecting...");
+      setMessageType("success");
+      setTimeout(() => navigate("/"), 600);
+    } else {
+      const detail = error || "Invalid email or password";
+      setMessage(detail);
       setMessageType("error");
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   return (
