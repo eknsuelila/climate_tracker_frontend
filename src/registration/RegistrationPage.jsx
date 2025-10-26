@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS, apiCall } from '../service/api.js';
 import './RegistrationPage.css';
 
 const RegistrationPage = () => {
@@ -31,39 +32,25 @@ const RegistrationPage = () => {
     setMessage(null);
     setMessageType(null);
 
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/climate/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+    const { data, success, error } = await apiCall(API_ENDPOINTS.REGISTER, {
+      method: 'POST',
+      body: JSON.stringify(formData),
+    });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Show backend validation errors
-        console.error('Registration error:', data);
-        const detail = typeof data?.detail === 'string' ? data.detail : 'Registration failed';
-        setMessage(detail);
-        setMessageType('error');
-      } else {
-        console.log('Registration successful:', data);
-        setMessage('Your account has been created. You can now log in.');
-        setMessageType('success');
-        // Redirect to login after a short delay
-        setTimeout(() => navigate('/login'), 800);
-        // Optionally, redirect to login page after successful registration
-        // window.location.href = "/login";
-      }
-    } catch (error) {
-      console.error('Network error:', error);
-      setMessage('Network error. Please try again later.');
+    if (success) {
+      console.log('Registration successful:', data);
+      setMessage('Your account has been created. You can now log in.');
+      setMessageType('success');
+      // Redirect to login after a short delay
+      setTimeout(() => navigate('/login'), 800);
+    } else {
+      console.error('Registration error:', error);
+      const detail = error || 'Registration failed';
+      setMessage(detail);
       setMessageType('error');
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   return (

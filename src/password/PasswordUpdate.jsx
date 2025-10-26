@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { API_ENDPOINTS, apiCall } from "../service/api.js";
 import "./PasswordReset.css";
 
 const PasswordUpdate = () => {
@@ -29,28 +30,20 @@ const PasswordUpdate = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      const response = await fetch("http://localhost:8000/api/climate/auth/update_password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token, new_password: password }),
-      });
+    setLoading(true);
+    const { data, success, error } = await apiCall(API_ENDPOINTS.UPDATE_PASSWORD, {
+      method: "POST",
+      body: JSON.stringify({ token, new_password: password }),
+    });
 
-      if (response.ok) {
-        alert("✅ Password updated successfully! Please login again.");
-        navigate("/login");
-      } else {
-        const err = await response.json();
-        alert(`❌ ${err.detail || "Failed to update password"}`);
-      }
-    } catch (error) {
-      alert("Error connecting to server.");
-    } finally {
-      setLoading(false);
+    if (success) {
+      alert("✅ Password updated successfully! Please login again.");
+      navigate("/login");
+    } else {
+      alert(`❌ ${error || "Failed to update password"}`);
     }
+    
+    setLoading(false);
   };
 
   return (

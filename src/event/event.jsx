@@ -1,46 +1,76 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import EventForm from "../components/EventForm.jsx";
 import "./event.css";
 
 const Event = () => {
-  const [eventData, setEventData] = useState({
-    title: "",
-    date: "",
-    location: "",
-    category: "",
-    severity: "",
-    sourceLink: "",
-    description: "",
-    impact: "",
-    organizer: "",
-    email: "",
-    imageURL: "",
-  });
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEventData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const handleSubmit = async (formData) => {
+    setLoading(true);
+    setMessage(null);
+    setMessageType(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("🌎 New Event Submitted:", eventData);
-    alert("✅ Event submitted successfully! Check console for details.");
-    setEventData({
-      title: "",
-      date: "",
-      location: "",
-      category: "",
-      severity: "",
-      sourceLink: "",
-      description: "",
-      impact: "",
-      organizer: "",
-      email: "",
-      imageURL: "",
-    });
+    try {
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      
+      // Combine description with additional user fields
+      let enhancedDescription = formData.description;
+      if (formData.location) {
+        enhancedDescription += `\n\nLocation: ${formData.location}`;
+      }
+      if (formData.severity) {
+        enhancedDescription += `\nSeverity Level: ${formData.severity}`;
+      }
+      if (formData.impact) {
+        enhancedDescription += `\n\nImpact Summary:\n${formData.impact}`;
+      }
+      if (formData.organizer) {
+        enhancedDescription += `\n\nSubmitted by: ${formData.organizer}`;
+      }
+      if (formData.email) {
+        enhancedDescription += `\nContact: ${formData.email}`;
+      }
+      
+      formDataToSend.append('description', enhancedDescription);
+      formDataToSend.append('category_id', formData.category_id);
+      formDataToSend.append('date', formData.date);
+      formDataToSend.append('source', formData.sourceLink || '');
+      formDataToSend.append('is_featured', 'false');
+
+      // Add image files if any
+      if (formData.imageFiles && formData.imageFiles.length > 0) {
+        for (let i = 0; i < formData.imageFiles.length; i++) {
+          formDataToSend.append('images', formData.imageFiles[i]);
+        }
+      }
+
+      const { API_ENDPOINTS, apiCallFormData } = await import("../service/api.js");
+      const { data, success, error } = await apiCallFormData(
+        `${API_ENDPOINTS.EVENTS}/add`,
+        formDataToSend
+      );
+
+      if (success) {
+        setMessage("✅ Event submitted successfully! It will be reviewed by administrators.");
+        setMessageType("success");
+        // Redirect to home after successful submission
+        setTimeout(() => navigate("/"), 2000);
+      } else {
+        setMessage(`❌ Failed to submit event: ${error}`);
+        setMessageType("error");
+      }
+    } catch (error) {
+      setMessage(`❌ Error submitting event: ${error.message}`);
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,178 +79,34 @@ const Event = () => {
         <h2 className="event-title">Submit a Climate Event</h2>
         <p className="event-subtext">
           Share a story that captures the impact of climate change in British Columbia.
-          Provide as much detail as possible to help our community understand the event’s
+          Provide as much detail as possible to help our community understand the event's
           significance.
         </p>
 
-        <form className="event-form" onSubmit={handleSubmit}>
-          {/* Event Basic Info */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="title">Event Title</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={eventData.title}
-                onChange={handleChange}
-                placeholder="e.g., 2021 Lytton Heatwave"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="date">Date</label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={eventData.date}
-                onChange={handleChange}
-                required
-              />
+        {message && (
+          <div className={`event-message ${messageType || ""}`}>
+            <div className="event-message-inner">
+              <div className="event-message-icon" aria-hidden="true">
+                {messageType === "success" ? "✅" : "⚠️"}
+              </div>
+              <div className="event-message-content">
+                <div className="event-message-title">
+                  {messageType === "success" ? "Success" : "Notice"}
+                </div>
+                <div className="event-message-body">{message}</div>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Location & Category */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="location">Location</label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value={eventData.location}
-                onChange={handleChange}
-                placeholder="e.g., Lytton, BC"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="category">Category</label>
-              <select
-                id="category"
-                name="category"
-                value={eventData.category}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Category</option>
-                <option value="Wildfire">Wildfire</option>
-                <option value="Flood">Flood</option>
-                <option value="Heatwave">Heatwave</option>
-                <option value="Oil Spill">Oil Spill</option>
-                <option value="Landslide">Landslide</option>
-                <option value="Drought">Drought</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Severity & Source */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="severity">Severity Level</label>
-              <select
-                id="severity"
-                name="severity"
-                value={eventData.severity}
-                onChange={handleChange}
-              >
-                <option value="">Select Severity</option>
-                <option value="Low">Low</option>
-                <option value="Moderate">Moderate</option>
-                <option value="High">High</option>
-                <option value="Severe">Severe</option>
-                <option value="Catastrophic">Catastrophic</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="sourceLink">Source / Reference Link</label>
-              <input
-                type="url"
-                id="sourceLink"
-                name="sourceLink"
-                value={eventData.sourceLink}
-                onChange={handleChange}
-                placeholder="e.g., https://www.cbc.ca/news/climate-event"
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="form-group full-width">
-            <label htmlFor="description">Event Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={eventData.description}
-              onChange={handleChange}
-              rows="5"
-              placeholder="Describe what happened, its causes, and context..."
-              required
-            />
-          </div>
-
-          {/* Impact */}
-          <div className="form-group full-width">
-            <label htmlFor="impact">Impact Summary</label>
-            <textarea
-              id="impact"
-              name="impact"
-              value={eventData.impact}
-              onChange={handleChange}
-              rows="4"
-              placeholder="Discuss how this event affected people, wildlife, or the environment."
-            />
-          </div>
-
-          {/* Organizer Info */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="organizer">Submitted By</label>
-              <input
-                type="text"
-                id="organizer"
-                name="organizer"
-                value={eventData.organizer}
-                onChange={handleChange}
-                placeholder="Your Name or Organization"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Contact Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={eventData.email}
-                onChange={handleChange}
-                placeholder="name@example.com"
-              />
-            </div>
-          </div>
-
-          {/* Image */}
-          <div className="form-group full-width">
-            <label htmlFor="imageURL">Event Image (Optional)</label>
-            <input
-              type="url"
-              id="imageURL"
-              name="imageURL"
-              value={eventData.imageURL}
-              onChange={handleChange}
-              placeholder="Paste image URL (e.g., from news source)"
-            />
-          </div>
-
-          <button type="submit" className="submit-btn">
-            🌿 Submit Event
-          </button>
-        </form>
+        <EventForm
+          onSubmit={handleSubmit}
+          loading={loading}
+          mode="create"
+          showUserFields={true}
+          showAdminFields={false}
+          submitText="🌿 Submit Event"
+        />
       </div>
     </div>
   );
