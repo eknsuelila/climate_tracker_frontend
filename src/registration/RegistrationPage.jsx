@@ -61,6 +61,8 @@ const RegistrationPage = () => {
     } finally {
       setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   return (

@@ -77,6 +77,8 @@ const PasswordUpdate = () => {
     } finally {
       setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   return (

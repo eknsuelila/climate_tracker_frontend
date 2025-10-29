@@ -59,6 +59,8 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   return (
