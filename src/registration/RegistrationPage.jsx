@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS, apiCall } from '../service/api.js';
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './RegistrationPage.css';
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
-  // State Management
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
   });
-
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState(null); // 'success' | 'error'
 
-  // Handle input changes
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -25,29 +21,45 @@ const RegistrationPage = () => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setMessage(null);
-    setMessageType(null);
 
-    const { data, success, error } = await apiCall(API_ENDPOINTS.REGISTER, {
-      method: 'POST',
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/climate/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    if (success) {
-      console.log('Registration successful:', data);
-      setMessage('Your account has been created. You can now log in.');
-      setMessageType('success');
-      // Redirect to login after a short delay
-      setTimeout(() => navigate('/login'), 800);
-    } else {
-      console.error('Registration error:', error);
-      const detail = error || 'Registration failed';
-      setMessage(detail);
-      setMessageType('error');
+      const data = await response.json();
+
+      if (!response.ok) {
+        const detail = typeof data?.detail === 'string' ? data.detail : 'Registration failed';
+        toast.error(`⚠️ ${detail}`, {
+          position: 'top-right',
+          autoClose: 4000,
+          theme: 'colored',
+          transition: Bounce,
+        });
+      } else {
+        toast.success('✅ Your account has been created. Redirecting to login...', {
+          position: 'top-right',
+          autoClose: 2500,
+          theme: 'colored',
+          transition: Bounce,
+        });
+        setTimeout(() => navigate('/login'), 800);
+      }
+    } catch (error) {
+      toast.error('⚠️ Network error. Please try again later.', {
+        position: 'top-right',
+        autoClose: 4000,
+        theme: 'colored',
+        transition: Bounce,
+      });
+    } finally {
+      setLoading(false);
     }
     
     setLoading(false);
@@ -58,22 +70,6 @@ const RegistrationPage = () => {
       <div className="registration-card">
         <h2>Create an Account</h2>
         <p>Join us today! It takes only a few steps.</p>
-
-        {message && (
-          <div className={`message ${messageType || ''}`}>
-            <div className="message-inner">
-              <div className="message-icon" aria-hidden="true">
-                {messageType === 'success' ? '✅' : '⚠️'}
-              </div>
-              <div className="message-content">
-                <div className="message-title">
-                  {messageType === 'success' ? 'Success' : 'Notice'}
-                </div>
-                <div className="message-body">{message}</div>
-              </div>
-            </div>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="registration-form">
           <div className="form-group">
@@ -124,6 +120,19 @@ const RegistrationPage = () => {
           Already have an account? Login
         </a>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </div>
   );
 };
