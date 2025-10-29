@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./PasswordReset.css";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PasswordReset = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +15,12 @@ const PasswordReset = () => {
     e.preventDefault();
 
     if (!email.trim()) {
-      alert("Please enter a valid email address.");
+      toast.warn("⚠️ Please enter a valid email address.", {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "colored",
+        transition: Bounce,
+      });
       return;
     }
 
@@ -28,14 +35,29 @@ const PasswordReset = () => {
       });
 
       if (response.ok) {
-        alert("✅ If this email is registered, a password reset link has been sent to your inbox.");
+        toast.success("✅ If this email is registered, a reset link has been sent to your inbox.", {
+          position: "top-right",
+          autoClose: 4000,
+          theme: "colored",
+          transition: Bounce,
+        });
         setEmail("");
       } else {
         const err = await response.json();
-        alert(`❌ ${err.detail || "Failed to send reset link."}`);
+        toast.error(`❌ ${err.detail || "User not found or failed to send reset link."}`, {
+          position: "top-right",
+          autoClose: 4000,
+          theme: "colored",
+          transition: Bounce,
+        });
       }
     } catch (error) {
-      alert("⚠️ Unable to connect to server. Please try again later.");
+      toast.error("⚠️ Unable to connect to server. Please try again later.", {
+        position: "top-right",
+        autoClose: 4000,
+        theme: "colored",
+        transition: Bounce,
+      });
     } finally {
       setLoading(false);
     }
@@ -74,6 +96,19 @@ const PasswordReset = () => {
           </a>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </div>
   );
 };
