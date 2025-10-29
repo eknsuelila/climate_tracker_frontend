@@ -31,7 +31,8 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        const detail = typeof data?.detail === "string" ? data.detail : "Invalid email or password";
+        const detail =
+          typeof data?.detail === "string" ? data.detail : "Invalid email or password";
         toast.error(`⚠️ ${detail}`, {
           position: "top-right",
           autoClose: 4000,
@@ -39,17 +40,32 @@ const Login = () => {
           transition: Bounce,
         });
       } else {
+        // Store token & user info
         localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Update auth context
         login(data.access_token);
+
         toast.success("✅ Login successful. Redirecting...", {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 1500,
           theme: "colored",
           transition: Bounce,
         });
-        setTimeout(() => navigate("/"), 600);
+
+        // Redirect based on user role
+        const userRole = data.user?.role || "EndUser";
+        setTimeout(() => {
+          if (userRole === "Admin") {
+            navigate("/admin");
+          } else {
+            navigate("/profile");
+          }
+        }, 150);
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("⚠️ Network error. Please try again.", {
         position: "top-right",
         autoClose: 4000,
@@ -59,8 +75,6 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
