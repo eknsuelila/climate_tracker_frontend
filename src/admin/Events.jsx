@@ -33,7 +33,13 @@ const Events = () => {
         formDataToSend.append('description', formData.description);
         formDataToSend.append('category_id', formData.category_id);
         formDataToSend.append('date', formData.date);
-        formDataToSend.append('source', formData.sourceLink || '');
+        formDataToSend.append('location', formData.location || '');
+        formDataToSend.append('impact_summary', formData.impact_summary || '');
+        formDataToSend.append('contact_email', formData.contact_email || '');
+        // Auto-calculate year from date
+        const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
+        formDataToSend.append('year', year.toString());
+        formDataToSend.append('source', formData.source || '');
         formDataToSend.append('is_featured', formData.is_featured);
 
         // Add image files if any
@@ -44,7 +50,7 @@ const Events = () => {
         }
 
         const { data, success, error } = await apiCallFormData(
-          `${API_ENDPOINTS.EVENTS}/add`,
+          `http://127.0.0.1:8000/api/climate/event/add`,
           formDataToSend
         );
 
@@ -64,7 +70,13 @@ const Events = () => {
         formDataToSend.append('description', formData.description);
         formDataToSend.append('category_id', formData.category_id);
         formDataToSend.append('date', formData.date);
-        formDataToSend.append('source', formData.sourceLink || '');
+        formDataToSend.append('location', formData.location || '');
+        formDataToSend.append('impact_summary', formData.impact_summary || '');
+        formDataToSend.append('contact_email', formData.contact_email || '');
+        // Auto-calculate year from date
+        const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
+        formDataToSend.append('year', year.toString());
+        formDataToSend.append('source', formData.source || '');
         formDataToSend.append('is_featured', formData.is_featured);
 
         // Add image files if any
@@ -75,8 +87,9 @@ const Events = () => {
         }
 
         const { data, success, error } = await apiCallFormData(
-          `${API_ENDPOINTS.EVENTS}/${currentEvent.event_id}`,
-          formDataToSend
+          `http://127.0.0.1:8000/api/climate/event/${currentEvent.event_id}`,
+          formDataToSend,
+          { method: 'PUT' }
         );
 
         if (success) {
@@ -106,7 +119,7 @@ const Events = () => {
   // Fetch events from backend
   const fetchEvents = async () => {
     setLoading(true);
-    const { data, success, error } = await apiCall(API_ENDPOINTS.EVENTS);
+    const { data, success, error } = await apiCall('http://127.0.0.1:8000/api/climate/event/');
     
     if (success) {
       setEvents(data);
@@ -133,15 +146,7 @@ const Events = () => {
     setShowModal(false);
     setShowViewModal(false);
     setCurrentEvent(null);
-    setFormData({
-      title: "",
-      description: "",
-      category_id: "",
-      date: "",
-      source: "",
-      is_featured: false,
-      imageFiles: null,
-    });
+    setModalMode('add'); // Reset modal mode
   };
 
   // Show modal for add/edit
@@ -160,7 +165,7 @@ const Events = () => {
   // Approve event
   const handleApprove = async (eventId) => {
     setLoading(true);
-    const { data, success, error } = await apiCall(`${API_ENDPOINTS.EVENTS}/${eventId}/approve`, {
+    const { data, success, error } = await apiCall(`http://127.0.0.1:8000/api/climate/event/${eventId}/approve`, {
       method: 'PATCH'
     });
 
@@ -179,7 +184,7 @@ const Events = () => {
   const handleDelete = async (eventId) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       setLoading(true);
-      const { data, success, error } = await apiCall(`${API_ENDPOINTS.EVENTS}/${eventId}`, {
+      const { data, success, error } = await apiCall(`http://127.0.0.1:8000/api/climate/event/${eventId}`, {
         method: 'DELETE'
       });
 
@@ -198,7 +203,7 @@ const Events = () => {
   // Toggle featured status
   const handleToggleFeatured = async (eventId, isFeatured) => {
     setLoading(true);
-    const { data, success, error } = await apiCall(`${API_ENDPOINTS.EVENTS}/${eventId}/feature`, {
+    const { data, success, error } = await apiCall(`http://127.0.0.1:8000/api/climate/event/${eventId}/feature`, {
       method: 'PATCH',
       body: JSON.stringify({ is_featured: isFeatured })
     });
@@ -432,6 +437,22 @@ const Events = () => {
                 </Col>
               </Row>
 
+              {currentEvent.location && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Location:</strong> {currentEvent.location}
+                  </Col>
+                </Row>
+              )}
+
+              {currentEvent.year && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Year:</strong> {currentEvent.year}
+                  </Col>
+                </Row>
+              )}
+
               {currentEvent.source && (
                 <Row className="mb-3">
                   <Col>
@@ -449,6 +470,23 @@ const Events = () => {
                   <p className="mt-2">{currentEvent.description}</p>
                 </Col>
               </Row>
+
+              {currentEvent.impact_summary && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Impact Summary:</strong>
+                    <p className="mt-2">{currentEvent.impact_summary}</p>
+                  </Col>
+                </Row>
+              )}
+
+              {currentEvent.contact_email && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Contact Email:</strong> {currentEvent.contact_email}
+                  </Col>
+                </Row>
+              )}
 
               {currentEvent.image_urls && currentEvent.image_urls.length > 0 && (
                 <Row className="mb-3">
@@ -472,6 +510,9 @@ const Events = () => {
               <Row>
                 <Col>
                   <strong>Uploaded by:</strong> {currentEvent.uploaded_by}
+                  {currentEvent.uploaded_by_user && currentEvent.uploaded_by_user !== currentEvent.uploaded_by && (
+                    <> ({currentEvent.uploaded_by_user})</>
+                  )}
                   <br />
                   <strong>Uploaded at:</strong> {new Date(currentEvent.uploaded_at).toLocaleString()}
                 </Col>

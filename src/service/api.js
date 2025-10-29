@@ -22,7 +22,7 @@ export const API_ENDPOINTS = {
   USER_PROFILE: `${API_BASE_URL}/user/profile`,
   
   // Event endpoints
-  EVENTS: `${API_BASE_URL}/event`,
+  EVENTS: `${API_BASE_URL}/event/`,  // Trailing slash to avoid redirect (which causes CORS issues)
   EVENT_BY_ID: (id) => `${API_BASE_URL}/event/${id}`,
   
   // Category endpoints
