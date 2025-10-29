@@ -15,32 +15,20 @@ const Event = () => {
     setMessageType(null);
 
     try {
-      // Create FormData for file upload
+      // Extract year from date
+      const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
+      
+      // Create FormData for file upload - send all fields separately as backend requires
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
-      
-      // Combine description with additional user fields
-      let enhancedDescription = formData.description;
-      if (formData.location) {
-        enhancedDescription += `\n\nLocation: ${formData.location}`;
-      }
-      if (formData.severity) {
-        enhancedDescription += `\nSeverity Level: ${formData.severity}`;
-      }
-      if (formData.impact) {
-        enhancedDescription += `\n\nImpact Summary:\n${formData.impact}`;
-      }
-      if (formData.organizer) {
-        enhancedDescription += `\n\nSubmitted by: ${formData.organizer}`;
-      }
-      if (formData.email) {
-        enhancedDescription += `\nContact: ${formData.email}`;
-      }
-      
-      formDataToSend.append('description', enhancedDescription);
+      formDataToSend.append('description', formData.description);
       formDataToSend.append('category_id', formData.category_id);
       formDataToSend.append('date', formData.date);
-      formDataToSend.append('source', formData.sourceLink || '');
+      formDataToSend.append('location', formData.location || '');
+      formDataToSend.append('impact_summary', formData.impact_summary || '');
+      formDataToSend.append('contact_email', formData.contact_email || '');
+      formDataToSend.append('year', year.toString());
+      formDataToSend.append('source', formData.source || '');
       formDataToSend.append('is_featured', 'false');
 
       // Add image files if any
@@ -50,9 +38,9 @@ const Event = () => {
         }
       }
 
-      const { API_ENDPOINTS, apiCallFormData } = await import("../service/api.js");
+      const { apiCallFormData } = await import("../service/api.js");
       const { data, success, error } = await apiCallFormData(
-        `${API_ENDPOINTS.EVENTS}/add`,
+        `http://127.0.0.1:8000/api/climate/event/add`,
         formDataToSend
       );
 

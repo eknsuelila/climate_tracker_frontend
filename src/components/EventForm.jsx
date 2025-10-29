@@ -21,7 +21,6 @@ const EventForm = ({
     location: "",
     impact_summary: "",
     contact_email: "",
-    year: "",
     severity: "", // ✅ added severity
     source: "",
     is_featured: false,
@@ -60,7 +59,6 @@ const EventForm = ({
         location: initialData.location || "",
         impact_summary: initialData.impact_summary || "",
         contact_email: initialData.contact_email || "",
-        year: initialData.year || "",
         severity: initialData.severity || "", // ✅ added
         source: initialData.source || "",
         is_featured: initialData.is_featured || false,
@@ -101,8 +99,10 @@ const EventForm = ({
         formDataToSend.append("location", formData.location);
         formDataToSend.append("impact_summary", formData.impact_summary);
         formDataToSend.append("contact_email", formData.contact_email);
-        formDataToSend.append("year", formData.year);
-        formDataToSend.append("severity", formData.severity); // ✅ added
+        // Auto-calculate year from date
+        const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
+        formDataToSend.append("year", year.toString());
+        // Note: severity field is not sent to backend as it's not in the backend schema
         formDataToSend.append("source", formData.source || "");
         formDataToSend.append("is_featured", formData.is_featured);
 
@@ -114,8 +114,8 @@ const EventForm = ({
 
         const endpoint =
           mode === "edit" && initialData
-            ? `${API_ENDPOINTS.EVENTS}/${initialData.event_id}`
-            : `${API_ENDPOINTS.EVENTS}/add`;
+            ? `http://127.0.0.1:8000/api/climate/event/${initialData.event_id}`
+            : `http://127.0.0.1:8000/api/climate/event/add`;
 
         const { success, error } = await apiCallFormData(endpoint, formDataToSend);
 
@@ -131,7 +131,6 @@ const EventForm = ({
               location: "",
               impact_summary: "",
               contact_email: "",
-              year: "",
               severity: "", // ✅ reset severity
               source: "",
               is_featured: false,
@@ -277,19 +276,7 @@ const EventForm = ({
               />
             </Form.Group>
           </Col>
-          <Col md={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>Year *</Form.Label>
-              <Form.Control
-                type="number"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-          </Col>
-          <Col md={3}>
+          <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Source</Form.Label>
               <Form.Control
