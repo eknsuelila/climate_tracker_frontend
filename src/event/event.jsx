@@ -15,19 +15,30 @@ const Event = () => {
     setMessageType(null);
 
     try {
-      // Extract year from date
-      const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
-      
-      // Create FormData for file upload - send all fields separately as backend requires
+      // Create FormData for file upload
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
+
+      // Description stays as user-entered description
       formDataToSend.append('description', formData.description);
+
+      // Required backend fields sent separately
       formDataToSend.append('category_id', formData.category_id);
       formDataToSend.append('date', formData.date);
+
+      // Auto-calculate year from date
+      if (formData.date) {
+        const year = new Date(formData.date).getFullYear();
+        formDataToSend.append('year', year);
+      }
+
+      // New required fields
       formDataToSend.append('location', formData.location || '');
       formDataToSend.append('impact_summary', formData.impact_summary || '');
       formDataToSend.append('contact_email', formData.contact_email || '');
-      formDataToSend.append('year', year.toString());
+      formDataToSend.append('severity', formData.severity || '');
+
+      // Optional fields
       formDataToSend.append('source', formData.source || '');
       formDataToSend.append('is_featured', 'false');
 
@@ -38,9 +49,9 @@ const Event = () => {
         }
       }
 
-      const { apiCallFormData } = await import("../service/api.js");
+      const { API_ENDPOINTS, apiCallFormData } = await import("../service/api.js");
       const { data, success, error } = await apiCallFormData(
-        `http://127.0.0.1:8000/api/climate/event/add`,
+        `${API_ENDPOINTS.EVENTS}add`,
         formDataToSend
       );
 

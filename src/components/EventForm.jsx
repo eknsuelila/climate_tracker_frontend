@@ -21,7 +21,7 @@ const EventForm = ({
     location: "",
     impact_summary: "",
     contact_email: "",
-    severity: "", // ✅ added severity
+    severity: "", // ✅ added severity (not sent to backend)
     source: "",
     is_featured: false,
     imageFiles: null,
@@ -59,7 +59,7 @@ const EventForm = ({
         location: initialData.location || "",
         impact_summary: initialData.impact_summary || "",
         contact_email: initialData.contact_email || "",
-        severity: initialData.severity || "", // ✅ added
+        severity: initialData.severity || "", // ✅ added (not sent to backend)
         source: initialData.source || "",
         is_featured: initialData.is_featured || false,
         imageFiles: null,
@@ -96,13 +96,15 @@ const EventForm = ({
         formDataToSend.append("description", formData.description);
         formDataToSend.append("category_id", formData.category_id);
         formDataToSend.append("date", formData.date);
+        // Auto-calculate year from date
+        if (formData.date) {
+          const year = new Date(formData.date).getFullYear();
+          formDataToSend.append("year", year);
+        }
         formDataToSend.append("location", formData.location);
         formDataToSend.append("impact_summary", formData.impact_summary);
         formDataToSend.append("contact_email", formData.contact_email);
-        // Auto-calculate year from date
-        const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
-        formDataToSend.append("year", year.toString());
-        // Note: severity field is not sent to backend as it's not in the backend schema
+        // Note: severity is not sent to backend, it's UI-only
         formDataToSend.append("source", formData.source || "");
         formDataToSend.append("is_featured", formData.is_featured);
 
@@ -114,8 +116,8 @@ const EventForm = ({
 
         const endpoint =
           mode === "edit" && initialData
-            ? `http://127.0.0.1:8000/api/climate/event/${initialData.event_id}`
-            : `http://127.0.0.1:8000/api/climate/event/add`;
+            ? `${API_ENDPOINTS.EVENTS}/${initialData.event_id}`
+            : `${API_ENDPOINTS.EVENTS}/add`;
 
         const { success, error } = await apiCallFormData(endpoint, formDataToSend);
 
@@ -131,7 +133,7 @@ const EventForm = ({
               location: "",
               impact_summary: "",
               contact_email: "",
-              severity: "", // ✅ reset severity
+              severity: "", // ✅ reset severity (UI-only)
               source: "",
               is_featured: false,
               imageFiles: null,

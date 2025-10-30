@@ -7,6 +7,7 @@
   width: 100%;
   height: calc(100vh - 80px); /* Full height minus navbar */
   overflow: hidden;
+  background: linear-gradient(135deg, #1c232b 0%, #2a3039 100%);
 }
 
 /* --- TOP PANEL (Details) --- */
@@ -16,9 +17,10 @@
   position: relative;
 }
 .details-content {
-  padding: 40px;
-  max-width: 800px;
+  padding: 0;
+  max-width: 1600px;
   margin: 0 auto;
+  background: transparent;
 }
 .details-image {
   width: 100%;
@@ -27,6 +29,91 @@
   border-radius: 8px;
   margin: 20px 0;
 }
+
+/* --- Image Slideshow Styles --- */
+.slideshow-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.slideshow-wrapper {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(28, 35, 43, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slideshow-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px);
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+.slideshow-image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.slideshow-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.slideshow-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 10px;
+  flex-shrink: 0;
+}
+
+.slideshow-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #3ebfff;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  outline: none;
+}
+
+.slideshow-dot:hover {
+  transform: scale(1.2);
+  background-color: rgba(62, 191, 255, 0.3);
+}
+
+.slideshow-dot.active {
+  background-color: #3ebfff;
+  transform: scale(1.3);
+  box-shadow: 0 0 8px rgba(62, 191, 255, 0.5);
+}
+
 .details-category {
   font-size: 1em;
   font-weight: 600;
@@ -64,7 +151,8 @@
   flex-shrink: 0;
   height: 250px;
   width: 100%;
-  border-top: 2px solid #f0f0f0;
+  border-top: 2px solid rgba(62, 191, 255, 0.2);
+  background: rgba(28, 35, 43, 0.6);
   overflow: hidden;
   position: relative;
   cursor: grab;
@@ -81,6 +169,7 @@
   flex-direction: row;
   height: 100%;
   position: relative;
+  will-change: transform;
   /* REMOVED align-items: center; */
 }
 
@@ -92,7 +181,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background-color: #e0e0e0;
+  background-color: rgba(62, 191, 255, 0.3);
 }
 
 /* --- Each Timeline Item (Horizontal) --- */
@@ -111,8 +200,8 @@
 .timeline-dot {
   width: 18px;
   height: 18px;
-  background-color: #fff;
-  border: 4px solid #e0e0e0;
+  background-color: rgba(28, 35, 43, 0.8);
+  border: 4px solid #3ebfff;
   border-radius: 50%;
   z-index: 2; /* On top of the bar */
   transition: all 0.2s ease;
@@ -131,16 +220,17 @@
   font-size: 1.1em;
   font-weight: bold;
   white-space: nowrap;
+  color: #3ebfff;
 }
 .item-title {
   font-size: 0.9em;
-  color: #555;
+  color: #d1d1d1;
   margin-top: 4px;
   white-space: nowrap;
 }
 .item-category {
   font-size: 0.8em;
-  color: #777;
+  color: #a9a9a9;
   margin-top: 4px;
   white-space: nowrap;
 }
@@ -169,10 +259,10 @@
 
 /* Active State */
 .timeline-item-active .timeline-dot {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #3ebfff;
+  border-color: #3ebfff;
   transform: translateY(-50%) scale(1.2); /* Keep vertical transform */
 }
 .timeline-item-active .item-year {
-  color: #007bff;
+  color: #3ebfff;
 }
