@@ -45,7 +45,7 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // Update auth context
-        login(data.access_token);
+        login(data.access_token, data.user);
 
         toast.success("✅ Login successful. Redirecting...", {
           position: "top-right",

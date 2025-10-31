@@ -28,7 +28,12 @@ export const AuthProvider = ({ children }) => {
         console.log('❌ Token expired:', isExpired);
         
         if (!isExpired) {
-          setUser({ isAuthenticated: true });
+          setUser({ 
+            isAuthenticated: true,
+            email: payload.email,
+            role: payload.role,
+            userId: payload.sub 
+          });
         } else {
           console.log('🗑️ Removing expired token');
           localStorage.removeItem('access_token');
@@ -41,10 +46,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token) => {
+  const login = (token, userData) => {
     console.log('🔐 Storing token:', token);
     localStorage.setItem('access_token', token);
-    setUser({ isAuthenticated: true });
+    setUser({ 
+      isAuthenticated: true,
+      email: userData.email,
+      role: userData.role,
+      userId: userData.user_id });
     console.log('✅ User logged in successfully');
   };
 
