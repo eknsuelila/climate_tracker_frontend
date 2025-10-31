@@ -20,6 +20,9 @@ export const API_ENDPOINTS = {
   
   // User endpoints
   USER_PROFILE: `${API_BASE_URL}/user/profile`,
+
+  //user management 
+  USER_MANAGEMENT : `${API_BASE_URL}/user/manage`,
   
   // Event endpoints
   EVENTS: `${API_BASE_URL}/event/`,
@@ -46,15 +49,15 @@ export const apiCall = async (url, options = {}) => {
   };
   
   try {
-    console.log('🌐 Making API call to:', url);
-    console.log('📋 Request config:', config);
+    console.log('ðŸŒ Making API call to:', url);
+    console.log('ðŸ“‹ Request config:', config);
     
     const response = await fetch(url, config);
-    console.log('📊 Response status:', response.status);
-    console.log('📊 Response ok:', response.ok);
+    console.log('ðŸ“Š Response status:', response.status);
+    console.log('ðŸ“Š Response ok:', response.ok);
     
     const data = await response.json();
-    console.log('📋 Response data:', data);
+    console.log('ðŸ“‹ Response data:', data);
     
     if (!response.ok) {
       throw new Error(data.detail || `HTTP error! status: ${response.status}`);
@@ -85,15 +88,15 @@ export const publicApiCall = async (url, options = {}) => {
   };
   
   try {
-    console.log('🌐 Making public API call to:', url);
-    console.log('📋 Request config:', config);
+    console.log('ðŸŒ Making public API call to:', url);
+    console.log('ðŸ“‹ Request config:', config);
     
     const response = await fetch(url, config);
-    console.log('📊 Response status:', response.status);
-    console.log('📊 Response ok:', response.ok);
+    console.log('ðŸ“Š Response status:', response.status);
+    console.log('ðŸ“Š Response ok:', response.ok);
     
     const data = await response.json();
-    console.log('📋 Response data:', data);
+    console.log('ðŸ“‹ Response data:', data);
     
     if (!response.ok) {
       throw new Error(data.detail || `HTTP error! status: ${response.status}`);
