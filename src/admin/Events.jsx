@@ -33,14 +33,21 @@ const Events = () => {
         formDataToSend.append('description', formData.description);
         formDataToSend.append('category_id', formData.category_id);
         formDataToSend.append('date', formData.date);
+        formDataToSend.append('source', formData.source || '');
+        formDataToSend.append('is_featured', formData.is_featured);
+        // Required: severity
+        formDataToSend.append('severity', formData.severity || '');
+        
+        // Auto-calculate year from date
+        if (formData.date) {
+          const year = new Date(formData.date).getFullYear();
+          formDataToSend.append('year', year);
+        }
+        
+        // Send location, impact_summary, and contact_email
         formDataToSend.append('location', formData.location || '');
         formDataToSend.append('impact_summary', formData.impact_summary || '');
         formDataToSend.append('contact_email', formData.contact_email || '');
-        // Auto-calculate year from date
-        const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
-        formDataToSend.append('year', year.toString());
-        formDataToSend.append('source', formData.source || '');
-        formDataToSend.append('is_featured', formData.is_featured);
 
         // Add image files if any
         if (formData.imageFiles && formData.imageFiles.length > 0) {
@@ -50,7 +57,7 @@ const Events = () => {
         }
 
         const { data, success, error } = await apiCallFormData(
-          `http://127.0.0.1:8000/api/climate/event/add`,
+          'http://127.0.0.1:8000/api/climate/event/add',
           formDataToSend
         );
 
@@ -70,14 +77,21 @@ const Events = () => {
         formDataToSend.append('description', formData.description);
         formDataToSend.append('category_id', formData.category_id);
         formDataToSend.append('date', formData.date);
+        formDataToSend.append('source', formData.source || '');
+        formDataToSend.append('is_featured', formData.is_featured);
+        // Required: severity
+        formDataToSend.append('severity', formData.severity || '');
+        
+        // Auto-calculate year from date
+        if (formData.date) {
+          const year = new Date(formData.date).getFullYear();
+          formDataToSend.append('year', year);
+        }
+        
+        // Send location, impact_summary, and contact_email
         formDataToSend.append('location', formData.location || '');
         formDataToSend.append('impact_summary', formData.impact_summary || '');
         formDataToSend.append('contact_email', formData.contact_email || '');
-        // Auto-calculate year from date
-        const year = formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear();
-        formDataToSend.append('year', year.toString());
-        formDataToSend.append('source', formData.source || '');
-        formDataToSend.append('is_featured', formData.is_featured);
 
         // Add image files if any
         if (formData.imageFiles && formData.imageFiles.length > 0) {
@@ -119,7 +133,7 @@ const Events = () => {
   // Fetch events from backend
   const fetchEvents = async () => {
     setLoading(true);
-    const { data, success, error } = await apiCall('http://127.0.0.1:8000/api/climate/event/');
+    const { data, success, error } = await apiCall(API_ENDPOINTS.EVENTS);
     
     if (success) {
       setEvents(data);
@@ -146,7 +160,7 @@ const Events = () => {
     setShowModal(false);
     setShowViewModal(false);
     setCurrentEvent(null);
-    setModalMode('add'); // Reset modal mode
+    setModalMode('add');
   };
 
   // Show modal for add/edit
@@ -453,6 +467,23 @@ const Events = () => {
                 </Row>
               )}
 
+              {currentEvent.impact_summary && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Impact Summary:</strong>
+                    <p className="mt-2">{currentEvent.impact_summary}</p>
+                  </Col>
+                </Row>
+              )}
+
+              {currentEvent.contact_email && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Contact Email:</strong> {currentEvent.contact_email}
+                  </Col>
+                </Row>
+              )}
+
               {currentEvent.source && (
                 <Row className="mb-3">
                   <Col>
@@ -470,23 +501,6 @@ const Events = () => {
                   <p className="mt-2">{currentEvent.description}</p>
                 </Col>
               </Row>
-
-              {currentEvent.impact_summary && (
-                <Row className="mb-3">
-                  <Col>
-                    <strong>Impact Summary:</strong>
-                    <p className="mt-2">{currentEvent.impact_summary}</p>
-                  </Col>
-                </Row>
-              )}
-
-              {currentEvent.contact_email && (
-                <Row className="mb-3">
-                  <Col>
-                    <strong>Contact Email:</strong> {currentEvent.contact_email}
-                  </Col>
-                </Row>
-              )}
 
               {currentEvent.image_urls && currentEvent.image_urls.length > 0 && (
                 <Row className="mb-3">
@@ -507,16 +521,13 @@ const Events = () => {
                 </Row>
               )}
 
-              <Row>
-                <Col>
-                  <strong>Uploaded by:</strong> {currentEvent.uploaded_by}
-                  {currentEvent.uploaded_by_user && currentEvent.uploaded_by_user !== currentEvent.uploaded_by && (
-                    <> ({currentEvent.uploaded_by_user})</>
-                  )}
-                  <br />
-                  <strong>Uploaded at:</strong> {new Date(currentEvent.uploaded_at).toLocaleString()}
-                </Col>
-              </Row>
+              {currentEvent.uploaded_by_user && (
+                <Row className="mb-3">
+                  <Col>
+                    <strong>Uploaded by:</strong> {currentEvent.uploaded_by_user}
+                  </Col>
+                </Row>
+              )}
             </div>
           )}
         </Modal.Body>
