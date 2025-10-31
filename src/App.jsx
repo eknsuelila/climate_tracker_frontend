@@ -13,6 +13,7 @@ import Map from "./map/map";
 import TimelinePage from "./timeline/timeline";
 import Profile from "./profile/profile";
 import EditProfile from "./profile/editProfile/editProfile";
+import AdminOnlyRoute from "./components/AdminOnlyRoute";
 
 // Admin pages
 import AdminLayout from "./admin/AdminLayout";
@@ -51,7 +52,11 @@ const App = () => {
           <Route path="/reset-password" element={<PasswordUpdate />} />
 
           {/* Admin Pages with sidebar */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={
+            <AdminOnlyRoute>
+              <AdminLayout />
+            </AdminOnlyRoute>
+          }>
             <Route index element={<Category />} />  {/* default page */}
             <Route path="category" element={<Category />} />
             <Route path="events" element={<Events />} />
