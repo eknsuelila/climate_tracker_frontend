@@ -31,6 +31,13 @@ export const API_ENDPOINTS = {
   // Category endpoints
   CATEGORIES: `${API_BASE_URL}/category`,
   CATEGORY_BY_ID: (id) => `${API_BASE_URL}/category/${id}`,
+  
+  // Geocoding endpoints
+  GEOCODING: (location) => `${API_BASE_URL}/geocoding/?location=${encodeURIComponent(location)}`,
+  
+  // Climate data endpoints
+  CLIMATE_REGION: (region) => `${API_BASE_URL}/climate/region?region=${encodeURIComponent(region)}`,
+  CLIMATE_CITY: (city) => `${API_BASE_URL}/climate/city?city=${encodeURIComponent(city)}`,
 };
 
 // Generic API call helper
