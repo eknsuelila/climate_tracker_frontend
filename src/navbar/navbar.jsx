@@ -51,6 +51,16 @@ const Navbar = () => {
             >
               ANALYTICS
             </NavLink>
+
+            {/* ✅ NEW About Us Button */}
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                "nav-item" + (isActive ? " active" : "")
+              }
+            >
+              ABOUT&nbsp;US
+            </NavLink>
           </Col>
 
           {/* Buttons */}
@@ -68,13 +78,20 @@ const Navbar = () => {
                     PROFILE
                   </Button>
                 </NavLink>
-                <Button variant="outline-secondary" onClick={handleLogout} className="rounded-pill px-3">
+                <Button
+                  variant="outline-secondary"
+                  onClick={handleLogout}
+                  className="rounded-pill px-3"
+                >
                   LOGOUT
                 </Button>
               </div>
             ) : (
               <Button variant="outline-secondary" className="rounded-pill px-3">
-                <NavLink to="/login" className="text-decoration-none text-reset">
+                <NavLink
+                  to="/login"
+                  className="text-decoration-none text-reset"
+                >
                   LOGIN
                 </NavLink>
               </Button>
