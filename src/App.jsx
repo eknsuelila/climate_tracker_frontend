@@ -14,6 +14,8 @@ import TimelinePage from "./timeline/timeline";
 import Profile from "./profile/profile";
 import EditProfile from "./profile/editProfile/editProfile";
 import AdminOnlyRoute from "./components/AdminOnlyRoute";
+import AboutUs from "./aboutus/AboutUs";
+
 
 // Admin pages
 import AdminLayout from "./admin/AdminLayout";
@@ -50,6 +52,8 @@ const App = () => {
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/reset" element={<PasswordResetPage />} />
           <Route path="/reset-password" element={<PasswordUpdate />} />
+          <Route path="/about" element={<AboutUs />} />
+
 
           {/* Admin Pages with sidebar */}
           <Route path="/admin" element={

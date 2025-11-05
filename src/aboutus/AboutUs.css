@@ -1,0 +1,78 @@
+.about-container {
+  background: linear-gradient(180deg, #08141f, #0f2230);
+  color: #e6f1f6;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  padding: 60px 20px;
+  min-height: 100vh;
+}
+
+.about-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.about-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.highlight {
+  color: #3ebfff; /* logo blue */
+}
+
+.subtitle {
+  color: #9dc6d6;
+  font-size: 1.1rem;
+}
+
+.about-section {
+  max-width: 900px;
+  margin: 0 auto 50px;
+  background-color: rgba(15, 34, 48, 0.85);
+  border-radius: 12px;
+  padding: 30px 40px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(46, 197, 255, 0.1);
+}
+
+.about-section h2 {
+  color: #3ebfff; /* changed from green to light blue */
+  margin-bottom: 10px;
+  font-size: 1.6rem;
+}
+
+.about-section p {
+  line-height: 1.7;
+  color: #d1e2ec;
+}
+
+.info-list,
+.stack-list {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.info-list li,
+.stack-list li {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.stats-card {
+  margin-top: 15px;
+  background-color: rgba(10, 24, 35, 0.8);
+  border-radius: 8px;
+  padding: 15px 20px;
+  border-left: 3px solid #3ebfff; /* light blue accent */
+}
+
+.stats-card p {
+  margin: 5px 0;
+}
+
+.about-footer {
+  text-align: center;
+  padding-top: 20px;
+  color: #7da0b8;
+  font-size: 0.9rem;
+}
