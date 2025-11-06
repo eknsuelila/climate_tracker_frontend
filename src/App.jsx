@@ -25,6 +25,7 @@ import Users from "./admin/Users";
 import Settings from "./admin/Settings";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Region from "./admin/Region";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -63,6 +64,7 @@ const App = () => {
           }>
             <Route index element={<Category />} />  {/* default page */}
             <Route path="category" element={<Category />} />
+            <Route path="region" element={<Region/>}/>
             <Route path="events" element={<Events />} />
             <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />

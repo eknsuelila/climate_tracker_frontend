@@ -10,6 +10,9 @@ const AdminSidebar = () => {
         <NavLink to="/admin" className="sidebar-btn">
           <FaHome className="me-2" /> Dashboard
         </NavLink>
+         <NavLink to="/admin/region" className="sidebar-btn">
+          <FaFolder className="me-2" /> Region
+        </NavLink>
 
         {/* Other links */}
         <NavLink to="/admin/category" className="sidebar-btn">

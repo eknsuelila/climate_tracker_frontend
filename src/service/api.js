@@ -31,6 +31,9 @@ export const API_ENDPOINTS = {
   // Category endpoints
   CATEGORIES: `${API_BASE_URL}/category`,
   CATEGORY_BY_ID: (id) => `${API_BASE_URL}/category/${id}`,
+
+  //region
+   REGIONS: `${API_BASE_URL}/region`,
   
   // Geocoding endpoints
   GEOCODING: (location) => `${API_BASE_URL}/geocoding/?location=${encodeURIComponent(location)}`,
