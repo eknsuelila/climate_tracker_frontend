@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../service/auth.jsx";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import "./navbar.css";
 
 const Navbar = () => {
@@ -17,12 +17,12 @@ const Navbar = () => {
         <Row className="align-items-center justify-content-between">
           {/* Logo */}
           <Col xs="auto">
-            <div className="navbar-logo">
+            <Link to="/" className="navbar-logo text-decoration-none">
               <span className="logo-icon">🌎</span>
               <span className="logo-text">
                 CLIMATE <span className="highlight">CHRONICLER</span>
               </span>
-            </div>
+            </Link>
           </Col>
 
           {/* Navigation Links */}
@@ -35,6 +35,7 @@ const Navbar = () => {
             >
               TIMELINE
             </NavLink>
+
             <NavLink
               to="/map"
               className={({ isActive }) =>
@@ -43,6 +44,7 @@ const Navbar = () => {
             >
               MAP
             </NavLink>
+
             <NavLink
               to="/analytics"
               className={({ isActive }) =>
@@ -52,7 +54,6 @@ const Navbar = () => {
               ANALYTICS
             </NavLink>
 
-            {/* ✅ NEW About Us Button */}
             <NavLink
               to="/about"
               className={({ isActive }) =>
@@ -78,6 +79,7 @@ const Navbar = () => {
                     PROFILE
                   </Button>
                 </NavLink>
+
                 <Button
                   variant="outline-secondary"
                   onClick={handleLogout}
