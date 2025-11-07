@@ -11,25 +11,71 @@ const RegistrationPage = () => {
     email: '',
     password: '',
   });
+  const [errors, setErrors] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' })); // Clear field error on change
+  };
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { username: '', email: '', password: '' };
+
+    const trimmedUsername = formData.username.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedPassword = formData.password.trim();
+
+    // Username validation
+    if (!trimmedUsername) {
+      newErrors.username = 'Username is required';
+      valid = false;
+    } else if (trimmedUsername.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+      valid = false;
+    }
+
+    // Email validation
+    if (!trimmedEmail) {
+      newErrors.email = 'Email is required';
+      valid = false;
+    } else if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
+      newErrors.email = 'Enter a valid email';
+      valid = false;
+    }
+
+    // Strong password validation
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!trimmedPassword) {
+      newErrors.password = 'Password is required';
+      valid = false;
+    } else if (!strongPasswordRegex.test(trimmedPassword)) {
+      newErrors.password =
+        'Password must be at least 8 characters, include uppercase, lowercase, number, and special character';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/climate/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          username: formData.username.trim(),
+          email: formData.email.trim(),
+          password: formData.password.trim(),
+        }),
       });
 
       const data = await response.json();
@@ -61,8 +107,6 @@ const RegistrationPage = () => {
     } finally {
       setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -81,8 +125,8 @@ const RegistrationPage = () => {
               value={formData.username}
               onChange={handleChange}
               className="form-control"
-              required
             />
+            {errors.username && <div className="text-danger mt-1">{errors.username}</div>}
           </div>
 
           <div className="form-group">
@@ -94,8 +138,8 @@ const RegistrationPage = () => {
               value={formData.email}
               onChange={handleChange}
               className="form-control"
-              required
             />
+            {errors.email && <div className="text-danger mt-1">{errors.email}</div>}
           </div>
 
           <div className="form-group">
@@ -107,8 +151,8 @@ const RegistrationPage = () => {
               value={formData.password}
               onChange={handleChange}
               className="form-control"
-              required
             />
+            {errors.password && <div className="text-danger mt-1">{errors.password}</div>}
           </div>
 
           <button type="submit" className="register-btn" disabled={loading}>
@@ -116,12 +160,11 @@ const RegistrationPage = () => {
           </button>
         </form>
 
-        <a href="/login" className="text-link">
+        <a href="/login" className="text-link mt-3 d-block">
           Already have an account? Login
         </a>
       </div>
 
-      {/* Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={4000}
