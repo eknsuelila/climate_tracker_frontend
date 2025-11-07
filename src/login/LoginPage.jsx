@@ -10,22 +10,58 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear field error on change
+  };
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { email: "", password: "" };
+
+    const trimmedEmail = formData.email.trim();
+    const trimmedPassword = formData.password.trim();
+
+    // Email validation
+    if (!trimmedEmail) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
+      newErrors.email = "Enter a valid email";
+      valid = false;
+    }
+
+    // Password validation
+    if (!trimmedPassword) {
+      newErrors.password = "Password is required";
+      valid = false;
+    } else if (trimmedPassword.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!validateForm()) return; // Stop submission if validation fails
+
     setLoading(true);
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/climate/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password.trim(),
+        }),
       });
 
       const data = await response.json();
@@ -40,11 +76,8 @@ const Login = () => {
           transition: Bounce,
         });
       } else {
-        // Store token & user info
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("user", JSON.stringify(data.user));
-
-        // Update auth context
         login(data.access_token, data.user);
 
         toast.success("✅ Login successful. Redirecting...", {
@@ -54,14 +87,10 @@ const Login = () => {
           transition: Bounce,
         });
 
-        // Redirect based on user role
         const userRole = data.user?.role || "EndUser";
         setTimeout(() => {
-          if (userRole === "Admin") {
-            navigate("/admin");
-          } else {
-            navigate("/profile");
-          }
+          if (userRole === "Admin") navigate("/admin");
+          else navigate("/profile");
         }, 150);
       }
     } catch (err) {
@@ -98,8 +127,8 @@ const Login = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
-                      required
                     />
+                    {errors.email && <div className="text-danger mt-1">{errors.email}</div>}
                   </Form.Group>
 
                   <Form.Group className="mb-4" controlId="password">
@@ -110,8 +139,8 @@ const Login = () => {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Enter your password"
-                      required
                     />
+                    {errors.password && <div className="text-danger mt-1">{errors.password}</div>}
                   </Form.Group>
 
                   <Button
@@ -144,7 +173,6 @@ const Login = () => {
         </Row>
       </Container>
 
-      {/* Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={4000}
