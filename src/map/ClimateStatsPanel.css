@@ -164,6 +164,104 @@
   }
 }
 
+/* Tabs Styling */
+.tabs-container {
+  display: flex;
+  gap: 5px;
+  margin-top: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px 15px;
+  background: transparent;
+  border: none;
+  color: #b0b0b0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: #3ebfff;
+  background: rgba(62, 191, 255, 0.1);
+}
+
+.tab-button.active {
+  color: #3ebfff;
+  border-bottom-color: #3ebfff;
+  background: rgba(62, 191, 255, 0.1);
+}
+
+/* Projections Controls */
+.projections-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.control-group label {
+  font-size: 0.85rem;
+  color: #b0b0b0;
+}
+
+.control-select {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(62, 191, 255, 0.3);
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-select:hover {
+  border-color: rgba(62, 191, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.control-select:focus {
+  outline: none;
+  border-color: #3ebfff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* AQI Display */
+.aqi-display {
+  margin-bottom: 20px;
+  text-align: center;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.aqi-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.aqi-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
 /* Scrollbar Styling */
 .climate-stats-panel::-webkit-scrollbar {
   width: 8px;

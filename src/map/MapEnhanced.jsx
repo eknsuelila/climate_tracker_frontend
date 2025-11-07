@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from "react-leaflet";
 import { API_ENDPOINTS, apiCall } from "../service/api.js";
 import L from "leaflet";
 import { Slab } from "react-loading-indicators";
+import { REGIONAL_DISTRICT_TO_REGION, REGION_COLORS, REGION_CENTERS } from "../config/regionMapping.js";
 import "./map.css";
 
 // Fix for default marker icons in React-Leaflet
@@ -22,67 +23,27 @@ const BC_BOUNDS = [
 const BC_CENTER = [53.7267, -127.6476];
 const BC_ZOOM = 6;
 
-// BC Regions with approximate polygon boundaries
+// BC Regions configuration (using imported constants)
 const BC_REGIONS = {
   "Northern BC": {
-    center: [57.0, -125.0],
-    bounds: [
-      [54.0, -131.0],
-      [54.0, -119.0],
-      [60.0, -119.0],
-      [60.0, -131.0],
-      [54.0, -131.0],
-    ],
-    color: "#3498db",
-    cities: ["Prince George", "Fort St. John", "Terrace"],
+    center: REGION_CENTERS["Northern BC"],
+    color: REGION_COLORS["Northern BC"],
   },
   "Thompson-Okanagan": {
-    center: [50.5, -119.0],
-    bounds: [
-      [49.0, -121.0],
-      [49.0, -117.0],
-      [52.0, -117.0],
-      [52.0, -121.0],
-      [49.0, -121.0],
-    ],
-    color: "#e74c3c",
-    cities: ["Kamloops", "Kelowna", "Vernon"],
+    center: REGION_CENTERS["Thompson-Okanagan"],
+    color: REGION_COLORS["Thompson-Okanagan"],
   },
   "Lower Mainland": {
-    center: [49.2, -123.0],
-    bounds: [
-      [48.8, -123.8],
-      [48.8, -122.2],
-      [49.5, -122.2],
-      [49.5, -123.8],
-      [48.8, -123.8],
-    ],
-    color: "#2ecc71",
-    cities: ["Vancouver", "Surrey", "Burnaby"],
+    center: REGION_CENTERS["Lower Mainland"],
+    color: REGION_COLORS["Lower Mainland"],
   },
   "Vancouver Island & Coast": {
-    center: [49.6, -125.0],
-    bounds: [
-      [48.3, -125.8],
-      [48.3, -123.5],
-      [50.8, -123.5],
-      [50.8, -125.8],
-      [48.3, -125.8],
-    ],
-    color: "#f39c12",
-    cities: ["Victoria", "Nanaimo", "Courtenay"],
+    center: REGION_CENTERS["Vancouver Island & Coast"],
+    color: REGION_COLORS["Vancouver Island & Coast"],
   },
   "Kootenay/Columbia": {
-    center: [49.5, -116.0],
-    bounds: [
-      [48.5, -118.0],
-      [48.5, -114.0],
-      [51.0, -114.0],
-      [51.0, -118.0],
-      [48.5, -118.0],
-    ],
-    color: "#9b59b6",
-    cities: ["Cranbrook", "Nelson", "Castlegar"],
+    center: REGION_CENTERS["Kootenay/Columbia"],
+    color: REGION_COLORS["Kootenay/Columbia"],
   },
 };
 
@@ -115,6 +76,7 @@ const MapEnhanced = ({ onRegionSelect, selectedRegion }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [hoveredRegion, setHoveredRegion] = useState(null);
+  const [regionGeoJSON, setRegionGeoJSON] = useState({}); // {regionName: geojsonFeature}
 
   // Fetch events
   useEffect(() => {
@@ -161,6 +123,46 @@ const MapEnhanced = ({ onRegionSelect, selectedRegion }) => {
     fetchCategories();
   }, []);
 
+  // Load and process GeoJSON file
+  useEffect(() => {
+    const loadGeoJSON = async () => {
+      try {
+        const response = await fetch("/ABMS_REGIONAL_DISTRICTS_SP.geojson");
+        if (!response.ok) {
+          console.warn("Could not load GeoJSON file, using fallback");
+          return;
+        }
+        
+        const geojsonData = await response.json();
+        
+        // Group features by high-level region
+        const groupedByRegion = {};
+        
+        geojsonData.features.forEach((feature) => {
+          const districtName = feature.properties?.ADMIN_AREA_NAME;
+          const highLevelRegion = REGIONAL_DISTRICT_TO_REGION[districtName];
+          
+          if (highLevelRegion) {
+            if (!groupedByRegion[highLevelRegion]) {
+              groupedByRegion[highLevelRegion] = {
+                type: "FeatureCollection",
+                features: [],
+              };
+            }
+            groupedByRegion[highLevelRegion].features.push(feature);
+          }
+        });
+        
+        setRegionGeoJSON(groupedByRegion);
+        console.log("GeoJSON loaded and grouped by region:", Object.keys(groupedByRegion));
+      } catch (e) {
+        console.error("Error loading GeoJSON:", e);
+      }
+    };
+    
+    loadGeoJSON();
+  }, []);
+
   // Filter events by selected category
   const filteredEvents = events.filter((event) => {
     if (selectedCategory === "all") return true;
@@ -200,20 +202,28 @@ const MapEnhanced = ({ onRegionSelect, selectedRegion }) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           />
 
-          {/* Region Polygons */}
-          {Object.entries(BC_REGIONS).map(([regionName, regionData]) => {
+          {/* Region Polygons from GeoJSON */}
+          {Object.keys(BC_REGIONS).map((regionName) => {
             const isSelected = selectedRegion === regionName;
             const isHovered = hoveredRegion === regionName;
+            const regionData = BC_REGIONS[regionName];
+            const geojsonData = regionGeoJSON[regionName];
+            
+            if (!geojsonData || !geojsonData.features || geojsonData.features.length === 0) {
+              // Fallback: don't render if GeoJSON not loaded yet
+              return null;
+            }
+            
             return (
-              <Polygon
+              <GeoJSON
                 key={regionName}
-                positions={regionData.bounds}
-                pathOptions={{
+                data={geojsonData}
+                style={() => ({
                   color: regionData.color,
                   fillColor: regionData.color,
                   fillOpacity: isSelected ? 0.4 : isHovered ? 0.3 : 0.2,
                   weight: isSelected ? 3 : 2,
-                }}
+                })}
                 eventHandlers={{
                   click: () => handleRegionClick(regionName),
                   mouseover: () => setHoveredRegion(regionName),

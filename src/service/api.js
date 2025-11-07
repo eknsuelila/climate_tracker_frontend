@@ -38,6 +38,9 @@ export const API_ENDPOINTS = {
   // Climate data endpoints
   CLIMATE_REGION: (region) => `${API_BASE_URL}/climate/region?region=${encodeURIComponent(region)}`,
   CLIMATE_CITY: (city) => `${API_BASE_URL}/climate/city?city=${encodeURIComponent(city)}`,
+  CLIMATE_PROJECTIONS: (region, model = "CMCC_CM2_VHR4", scenario = "ssp585") => 
+    `${API_BASE_URL}/climate/projections?region=${encodeURIComponent(region)}&model=${encodeURIComponent(model)}&scenario=${encodeURIComponent(scenario)}`,
+  CLIMATE_AIR_QUALITY: (region) => `${API_BASE_URL}/climate/air-quality?region=${encodeURIComponent(region)}`,
 };
 
 // Generic API call helper
