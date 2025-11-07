@@ -18,19 +18,23 @@ export default function AboutUs() {
   return (
     <div className="about-container">
       <header className="about-header">
-        <h1>About <span className="highlight">Climate Chronicler</span></h1>
+        <h1>
+          About <span className="highlight">Climate Chronicler</span>
+        </h1>
         <p className="subtitle">
-          Tracking environmental change and community resilience across British Columbia.
+          Tracking environmental change and community resilience across British
+          Columbia.
         </p>
       </header>
 
       <section className="about-section">
         <h2>Our Mission</h2>
         <p>
-          Climate Chronicler is a modern climate tracking platform built with React and FastAPI.
-          We help visualize and understand how temperature, precipitation, air quality, and other
-          environmental indicators change across British Columbia. Our goal is to empower citizens,
-          researchers, and policy makers with accurate, open climate data.
+          Climate Chronicler is a modern climate tracking platform built with
+          React and FastAPI. We help visualize and understand how temperature,
+          precipitation, air quality, and other environmental indicators change
+          across British Columbia. Our goal is to empower citizens, researchers,
+          and policy makers with accurate, open climate data.
         </p>
       </section>
 
@@ -44,40 +48,17 @@ export default function AboutUs() {
         </ul>
       </section>
 
-      <section className="about-section">
-        <h2>Technology Stack</h2>
-        <p>
-          Our platform uses a powerful combination of frontend and backend technologies:
-        </p>
-        <ul className="stack-list">
-          <li><strong>Frontend:</strong> React.js hosted on GitHub Pages</li>
-          <li><strong>Backend:</strong> FastAPI (Python) hosted on GitHub or Render</li>
-          <li><strong>Database:</strong> PostgreSQL for structured climate data</li>
-          <li><strong>Visualization:</strong> Chart.js & Leaflet for real-time mapping</li>
-        </ul>
-      </section>
+      {/* Removed Technology Stack */}
 
-      <section className="about-section">
-        <h2>Our Impact</h2>
-        {loading ? (
-          <p>Loading live data from backend...</p>
-        ) : stats ? (
-          <div className="stats-card">
-            <p><strong>Active Sensors:</strong> {stats.sensors}</p>
-            <p><strong>Communities Monitored:</strong> {stats.communities}</p>
-            <p><strong>Data Points Collected:</strong> {stats.records}</p>
-          </div>
-        ) : (
-          <p>Unable to load backend statistics.</p>
-        )}
-      </section>
+      {/* Removed Our Impact */}
 
       <section className="about-section">
         <h2>Land Acknowledgement</h2>
         <p>
-          We acknowledge that the data represented on Climate Chronicler spans the traditional
-          territories of Indigenous Peoples across British Columbia. We are grateful to live and
-          work on these lands, and we aim to promote environmental awareness and stewardship.
+          We acknowledge that the data represented on Climate Chronicler spans
+          the traditional territories of Indigenous Peoples across British
+          Columbia. We are grateful to live and work on these lands, and we aim
+          to promote environmental awareness and stewardship.
         </p>
       </section>
 
