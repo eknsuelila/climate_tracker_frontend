@@ -15,8 +15,9 @@ const ClimateStatsPanel = ({ region }) => {
   const [projectionsData, setProjectionsData] = useState(null);
   const [projectionsLoading, setProjectionsLoading] = useState(false);
   const [projectionsError, setProjectionsError] = useState(null);
-  const [selectedModel, setSelectedModel] = useState("CMCC_CM2_VHR4");
-  const [selectedScenario, setSelectedScenario] = useState("ssp585");
+  // Fixed model and scenario (high emissions)
+  const PROJECTION_MODEL = "CMCC_CM2_VHR4";
+  const PROJECTION_SCENARIO = "ssp585"; // High emissions
   
   // Air quality data state
   const [airQualityData, setAirQualityData] = useState(null);
@@ -65,7 +66,7 @@ const ClimateStatsPanel = ({ region }) => {
       
       try {
         const { data, success, error: apiError } = await apiCall(
-          API_ENDPOINTS.CLIMATE_PROJECTIONS(region, selectedModel, selectedScenario)
+          API_ENDPOINTS.CLIMATE_PROJECTIONS(region, PROJECTION_MODEL, PROJECTION_SCENARIO)
         );
 
         if (success && data) {
@@ -82,7 +83,7 @@ const ClimateStatsPanel = ({ region }) => {
     };
 
     fetchProjections();
-  }, [region, activeTab, selectedModel, selectedScenario]);
+  }, [region, activeTab]);
 
   // Fetch air quality data
   useEffect(() => {
@@ -180,10 +181,6 @@ const ClimateStatsPanel = ({ region }) => {
           projectionsData={projectionsData}
           loading={projectionsLoading}
           error={projectionsError}
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          selectedScenario={selectedScenario}
-          setSelectedScenario={setSelectedScenario}
         />
       )}
 
@@ -243,12 +240,6 @@ const HistoricalTab = ({ climateData, loading, error }) => {
             {avg_temperature ? `${avg_temperature}°C` : "N/A"}
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Total Precipitation</div>
-          <div className="stat-value">
-            {total_precipitation ? `${total_precipitation.toFixed(0)} mm` : "N/A"}
-          </div>
-        </div>
         {avg_snowfall !== null && avg_snowfall !== undefined && (
           <div className="stat-card">
             <div className="stat-label">Avg Snowfall</div>
@@ -300,23 +291,6 @@ const HistoricalTab = ({ climateData, loading, error }) => {
         </div>
       )}
 
-      {/* Precipitation Chart */}
-      {chartData.length > 0 && (
-        <div className="chart-section">
-          <h4>Precipitation Trend</h4>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis label={{ value: "mm", angle: -90, position: "insideLeft" }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="precipitation" fill="#3498db" name="Precipitation (mm)" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
       {/* Snowfall Chart (if available) */}
       {chartData.length > 0 && chartData.some(d => d.snowfall !== null && d.snowfall !== undefined) && (
         <div className="chart-section">
@@ -359,7 +333,7 @@ const HistoricalTab = ({ climateData, loading, error }) => {
 };
 
 // Future Projections Component
-const ProjectionsTab = ({ region, projectionsData, loading, error, selectedModel, setSelectedModel, selectedScenario, setSelectedScenario }) => {
+const ProjectionsTab = ({ region, projectionsData, loading, error }) => {
   if (loading && !projectionsData) {
     return <div className="loading-spinner">Loading projections...</div>;
   }
@@ -370,36 +344,10 @@ const ProjectionsTab = ({ region, projectionsData, loading, error, selectedModel
 
   return (
     <>
-      <div className="projections-controls">
-        <div className="control-group">
-          <label>Model:</label>
-          <select 
-            value={selectedModel} 
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="control-select"
-          >
-            <option value="CMCC_CM2_VHR4">CMCC CM2 VHR4</option>
-            <option value="EC_Earth3P_HR">EC Earth3P HR</option>
-            <option value="HadGEM3_GC31_MM">HadGEM3 GC31 MM</option>
-          </select>
-        </div>
-        <div className="control-group">
-          <label>Scenario:</label>
-          <select 
-            value={selectedScenario} 
-            onChange={(e) => setSelectedScenario(e.target.value)}
-            className="control-select"
-          >
-            <option value="ssp126">Low Emissions (SSP1-2.6)</option>
-            <option value="ssp585">High Emissions (SSP5-8.5)</option>
-          </select>
-        </div>
-      </div>
-
       {projectionsData ? (
         <>
           <div className="data-source">
-            Source: Open-Meteo Climate API ({projectionsData.model}, {projectionsData.scenario_name})
+            Source: Open-Meteo Climate API ({projectionsData.model}, High Emissions - SSP5-8.5)
           </div>
 
           {/* Projections Summary */}
@@ -413,10 +361,12 @@ const ProjectionsTab = ({ region, projectionsData, loading, error, selectedModel
             {projectionsData.projections && projectionsData.projections.length > 0 && (
               <>
                 <div className="stat-card">
-                  <div className="stat-label">2050 Avg Temp</div>
+                  <div className="stat-label">2040 Avg Precipitation</div>
                   <div className="stat-value">
-                    {projectionsData.projections.find(p => p.year === 2050)?.temperature 
-                      ? `${projectionsData.projections.find(p => p.year === 2050).temperature}°C`
+                    {projectionsData.projections.find(p => p.year === 2040)?.precipitation 
+                      ? `${projectionsData.projections.find(p => p.year === 2040).precipitation.toFixed(0)} mm`
+                      : projectionsData.projections[projectionsData.projections.length - 1]?.precipitation
+                      ? `${projectionsData.projections[projectionsData.projections.length - 1].precipitation.toFixed(0)} mm`
                       : "N/A"}
                   </div>
                 </div>
