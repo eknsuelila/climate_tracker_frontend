@@ -21,7 +21,9 @@ const EventForm = ({
     location: "",
     impact_summary: "",
     contact_email: "",
-    severity: "", // ✅ added severity (not sent to backend)
+    severity: "",
+    region: "",
+    type: "",
     source: "",
     is_featured: false,
     imageFiles: null,
@@ -59,7 +61,9 @@ const EventForm = ({
         location: initialData.location || "",
         impact_summary: initialData.impact_summary || "",
         contact_email: initialData.contact_email || "",
-        severity: initialData.severity || "", // ✅ added (not sent to backend)
+        severity: initialData.severity || "",
+        region: initialData.region || "",
+        type: initialData.type || "",
         source: initialData.source || "",
         is_featured: initialData.is_featured || false,
         imageFiles: null,
@@ -104,7 +108,9 @@ const EventForm = ({
         formDataToSend.append("location", formData.location);
         formDataToSend.append("impact_summary", formData.impact_summary);
         formDataToSend.append("contact_email", formData.contact_email);
-        // Note: severity is not sent to backend, it's UI-only
+        formDataToSend.append("severity", formData.severity);
+        formDataToSend.append("region", formData.region);
+        formDataToSend.append("type", formData.type);
         formDataToSend.append("source", formData.source || "");
         formDataToSend.append("is_featured", formData.is_featured);
 
@@ -133,7 +139,9 @@ const EventForm = ({
               location: "",
               impact_summary: "",
               contact_email: "",
-              severity: "", // ✅ reset severity (UI-only)
+              severity: "",
+              region: "",
+              type: "",
               source: "",
               is_featured: false,
               imageFiles: null,
@@ -248,24 +256,60 @@ const EventForm = ({
           />
         </Form.Group>
 
-        {/* ✅ NEW FIELD - Severity */}
-        <Form.Group className="mb-3">
-          <Form.Label>Severity *</Form.Label>
-          <Form.Select
-            name="severity"
-            value={formData.severity}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Severity</option>
-            <option value="Low">Low</option>
-            <option value="Moderate">Moderate</option>
-            <option value="High">High</option>
-            <option value="Severe">Severe</option>
-          </Form.Select>
-        </Form.Group>
+        <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Severity *</Form.Label>
+              <Form.Select
+                name="severity"
+                value={formData.severity}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Severity</option>
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+                <option value="Severe">Severe</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Region *</Form.Label>
+              <Form.Select
+                name="region"
+                value={formData.region}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Region</option>
+                <option value="Northern BC">Northern BC</option>
+                <option value="Thompson-Okanagan">Thompson-Okanagan</option>
+                <option value="Lower Mainland">Lower Mainland</option>
+                <option value="Vancouver Island & Coast">Vancouver Island & Coast</option>
+                <option value="Kootenay/Columbia">Kootenay/Columbia</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
 
         <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Event Type *</Form.Label>
+              <Form.Select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Type</option>
+                <option value="minor">Minor</option>
+                <option value="major">Major</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Contact Email *</Form.Label>
@@ -278,7 +322,10 @@ const EventForm = ({
               />
             </Form.Group>
           </Col>
-          <Col md={6}>
+        </Row>
+
+        <Row>
+          <Col md={12}>
             <Form.Group className="mb-3">
               <Form.Label>Source</Form.Label>
               <Form.Control
@@ -286,7 +333,7 @@ const EventForm = ({
                 name="source"
                 value={formData.source}
                 onChange={handleChange}
-                placeholder="Optional"
+                placeholder="Optional - e.g., News article, Government report, etc."
               />
             </Form.Group>
           </Col>

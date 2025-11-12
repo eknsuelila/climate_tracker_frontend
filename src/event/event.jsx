@@ -37,6 +37,8 @@ const Event = () => {
       formDataToSend.append('impact_summary', formData.impact_summary || '');
       formDataToSend.append('contact_email', formData.contact_email || '');
       formDataToSend.append('severity', formData.severity || '');
+      formDataToSend.append('region', formData.region || '');
+      formDataToSend.append('type', formData.type || '');
 
       // Optional fields
       formDataToSend.append('source', formData.source || '');
