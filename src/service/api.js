@@ -41,6 +41,16 @@ export const API_ENDPOINTS = {
   CLIMATE_PROJECTIONS: (region, model = "CMCC_CM2_VHR4", scenario = "ssp585") => 
     `${API_BASE_URL}/climate/projections?region=${encodeURIComponent(region)}&model=${encodeURIComponent(model)}&scenario=${encodeURIComponent(scenario)}`,
   CLIMATE_AIR_QUALITY: (region) => `${API_BASE_URL}/climate/air-quality?region=${encodeURIComponent(region)}`,
+
+ CLIMATE_EVENTS: (region) =>
+    `${API_BASE_URL}/climate/events?region=${encodeURIComponent(region)}`,
+
+  CLIMATE_REGIONS: () =>
+    `${API_BASE_URL}/climate/climate/region/all`,
+
+  CLIMATE_SEVERITY: (region) =>
+  `${API_BASE_URL}/climate/severity?region=${encodeURIComponent(region)}`,
+
 };
 
 // Generic API call helper
