@@ -1,78 +1,142 @@
+/* ===== Edit Profile Page ===== */
 .edit-profile-page {
-  min-height: 100vh;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1c232b 40%, #2b3947 100%);
-  font-family: 'Poppins', sans-serif;
-  color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #1c232b;
+  color: #e0f0ff;
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  font-family: "Poppins", sans-serif;
 }
 
+/* ===== Heading ===== */
 .edit-profile-page h1 {
-  font-size: 2.5rem;
-  margin-bottom: 40px;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #3ebfff;
+  margin-bottom: 2.5rem;
+  text-align: center;
 }
 
-/* Form Styling */
-.edit-profile-form {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 30px 40px;
-  border-radius: 12px;
-  max-width: 500px;
+/* ===== Form Card ===== */
+.edit-profile-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  padding: 3rem 4rem;
   width: 100%;
+  max-width: 700px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 0 10px rgba(255,255,255,0.05);
-}
-
-.edit-profile-form label {
-  font-weight: 500;
-  margin-bottom: 5px;
-}
-
-.edit-profile-form input {
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #3ebfff;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1rem;
-  outline: none;
+  justify-content: center;
   transition: all 0.3s ease;
 }
 
-.edit-profile-form input:focus {
-  background: rgba(62, 191, 255, 0.1);
+.edit-profile-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(62, 191, 255, 0.25);
+}
+
+/* ===== Labels & Inputs ===== */
+.edit-profile-card label {
+  display: block;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+  color: #aee4ff;
+  font-size: 1rem;
+}
+
+.input-field,
+.input-textarea {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #3ebfff;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #e2f4ff;
+  font-size: 1rem;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field:focus,
+.input-textarea:focus {
+  outline: none;
   border-color: #3ebfff;
   box-shadow: 0 0 10px #3ebfff;
 }
 
+/* ===== Social Links Section ===== */
+.social-links-edit {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 1.5rem 2rem;
+  margin-top: 2rem;
+}
+
+.social-links-edit h3 {
+  color: #3ebfff;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid #3ebfff;
+  padding-left: 10px;
+}
+
+/* ===== Button Group ===== */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
 /* Save Button */
 .save-btn {
-  margin-top: 10px;
-  padding: 12px 20px;
+  background-color: transparent;
   border: 2px solid #3ebfff;
-  border-radius: 25px;
-  background: transparent;
   color: #3ebfff;
+  padding: 0.8rem 2.4rem;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  border-radius: 40px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .save-btn:hover {
-  background: #3ebfff;
+  background-color: #3ebfff;
   color: #1c232b;
   box-shadow: 0 0 10px #3ebfff, 0 0 20px #3ebfff;
-  transform: translateY(-2px);
+  transform: scale(1.05);
 }
 
-/* Responsive adjustments */
+/* Cancel Button */
+.cancel-btn {
+  border: 2px solid #888;
+  color: #ccc;
+  background-color: transparent;
+  padding: 0.8rem 2.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #444;
+  color: #fff;
+}
+
+/* ===== Responsive Layout ===== */
 @media (max-width: 768px) {
-  .edit-profile-form {
-    padding: 20px;
+  .edit-profile-card {
+    padding: 2rem;
+  }
+
+  .edit-profile-page h1 {
+    font-size: 2rem;
   }
 }
