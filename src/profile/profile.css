@@ -1,87 +1,189 @@
+/* ===== Profile Page ===== */
 .profile-page {
-  min-height: 100vh;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #1c232b 40%, #2b3947 100%);
-  font-family: 'Poppins', sans-serif;
-  color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #1c232b; /* matches navbar */
+  color: #e0f0ff;
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  font-family: 'Poppins', sans-serif;
 }
 
+/* ===== Heading ===== */
 .profile-page h1 {
-  font-size: 2.5rem;
-  margin-bottom: 40px;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #3ebfff; /* blue accent */
+  margin-bottom: 2.5rem;
+  text-align: center;
 }
 
+/* ===== Profile Card (Stretched Form) ===== */
 .profile-card {
   background: rgba(255, 255, 255, 0.05);
-  padding: 30px 40px;
-  border-radius: 12px;
-  display: flex;
-  gap: 40px;
-  align-items: center;
-  max-width: 700px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  padding: 3rem 4rem;
   width: 100%;
-  box-shadow: 0 0 10px rgba(255,255,255,0.05);
+  max-width: 1300px; /* stretched wider */
+  display: flex;
+  flex-direction: row; /* horizontal alignment */
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 3rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(62, 191, 255, 0.25);
+}
+
+/* ===== Avatar Section ===== */
 .avatar-container {
-  flex-shrink: 0;
+  flex: 0 0 200px;
+  text-align: center;
 }
 
 .avatar {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   border: 4px solid #3ebfff;
-  object-fit: cover;
+  box-shadow: 0 0 25px #3ebfff;
+  transition: 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px #3ebfff;
+}
+
+/* ===== Profile Info ===== */
+.profile-info {
+  flex: 1;
+  text-align: left;
 }
 
 .profile-info h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
+  font-size: 2rem;
+  color: #aee4ff;
+  margin-bottom: 0.5rem;
 }
 
 .profile-info p {
-  margin: 5px 0;
   font-size: 1rem;
+  margin: 0.4rem 0;
+  color: #cde9ff;
 }
 
-.edit-btn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  border: 2px solid #3ebfff;
-  border-radius: 25px;
-  background: transparent;
+/* ===== Bio Section ===== */
+.bio {
+  margin-top: 1.8rem;
+  margin-bottom: 2rem;
+}
+
+.bio strong {
   color: #3ebfff;
+  font-size: 1.1rem;
+}
+
+.bio p {
+  margin-top: 0.5rem;
+  color: #b7dfff;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ===== Activity Overview ===== */
+.stats-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 2rem;
+  width: 100%;
+  margin-bottom: 2rem;
+  border-left: 3px solid #3ebfff;
+}
+
+.stats-section h3 {
+  color: #3ebfff;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.stats-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.stats-section li {
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
+  color: #e2f4ff;
+}
+
+/* ===== Social Links ===== */
+.social-links {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.social-links a {
+  color: #3ebfff;
+  text-decoration: none;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 1.05rem;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.social-links a:hover {
+  color: #aee4ff;
+  transform: scale(1.1);
+}
+
+/* ===== Edit Button ===== */
+.edit-btn {
+  background-color: transparent;
+  border: 2px solid #3ebfff;
+  color: #3ebfff;
+  padding: 0.8rem 2.4rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  border-radius: 40px;
   transition: all 0.3s ease;
+  display: block;
+  margin-top: 2rem;
 }
 
 .edit-btn:hover {
-  background: #3ebfff;
+  background-color: #3ebfff;
   color: #1c232b;
+  transform: scale(1.05);
   box-shadow: 0 0 10px #3ebfff, 0 0 20px #3ebfff;
-  transform: translateY(-2px);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* ===== Responsive Design ===== */
+@media (max-width: 992px) {
   .profile-card {
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    padding: 2.5rem;
   }
 
-  .avatar {
-    width: 120px;
-    height: 120px;
+  .avatar-container {
+    margin-bottom: 2rem;
   }
 
-  .profile-info h2 {
-    font-size: 1.5rem;
+  .profile-info {
+    text-align: center;
+  }
+
+  .social-links {
+    justify-content: center;
   }
 }
