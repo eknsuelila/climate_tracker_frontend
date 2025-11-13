@@ -123,9 +123,16 @@ const TimelinePage = () => {
           .filter(event => event.status === 1)
           .map(event => {
             // Get all image URLs and randomize them
+            // Handle both Cloudinary URLs (full URLs) and local URLs (relative paths)
             const imageUrls = event.image_urls && event.image_urls.length > 0
               ? event.image_urls
-                  .map(url => `${API_BASE_URL}${url}`)
+                  .map(url => {
+                    // If URL is already a full URL (Cloudinary), use it as-is
+                    // Otherwise, prepend API base URL for local images
+                    return url.startsWith('http://') || url.startsWith('https://')
+                      ? url
+                      : `${API_BASE_URL}${url}`;
+                  })
                   .sort(() => Math.random() - 0.5) // Randomize order
               : [];
             

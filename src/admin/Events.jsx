@@ -44,7 +44,7 @@ const Events = () => {
           formDataToSend.append('year', year);
         }
         
-        // Send location, impact_summary, and contact_email
+        // Send location, impact_summary, and contact_email, region, type
         formDataToSend.append('location', formData.location || '');
         formDataToSend.append('impact_summary', formData.impact_summary || '');
         formDataToSend.append('contact_email', formData.contact_email || '');
@@ -511,15 +511,21 @@ const Events = () => {
                   <Col>
                     <strong>Images:</strong>
                     <div className="mt-2">
-                      {currentEvent.image_urls.map((url, index) => (
-                        <img
-                          key={index}
-                          src={`http://127.0.0.1:8000${url}`}
-                          alt={`Event image ${index + 1}`}
-                          className="img-thumbnail me-2"
-                          style={{ maxWidth: '100px', maxHeight: '100px' }}
-                        />
-                      ))}
+                      {currentEvent.image_urls.map((url, index) => {
+                        // Handle both Cloudinary URLs (full URLs) and local URLs (relative paths)
+                        const imageUrl = url.startsWith('http://') || url.startsWith('https://')
+                          ? url
+                          : `http://127.0.0.1:8000${url}`;
+                        return (
+                          <img
+                            key={index}
+                            src={imageUrl}
+                            alt={`Event image ${index + 1}`}
+                            className="img-thumbnail me-2"
+                            style={{ maxWidth: '100px', maxHeight: '100px' }}
+                          />
+                        );
+                      })}
                     </div>
                   </Col>
                 </Row>
