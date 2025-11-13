@@ -1,29 +1,45 @@
-import { NavLink } from "react-router-dom";
-import { FaFolder, FaClipboardCheck, FaUsers, FaCog, FaHome } from "react-icons/fa";
+import React from "react";
+import { Button } from "react-bootstrap";
+import { FaFolder, FaClipboardCheck, FaUsers, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import "./admin.css";
 
 const AdminSidebar = () => {
+  const navigate = useNavigate();
+
+  // Handle Logout
+  const handleLogout = () => {
+    // Example: remove stored user/admin data if any
+    localStorage.removeItem("adminUser");
+
+    // Navigate to login page
+    navigate("/login");
+  };
+
   return (
     <aside className="admin-sidebar">
       <h2 className="sidebar-title">Admin Panel</h2>
-      <div className="sidebar-menu">
-        {/* Dashboard / Home */}
-        <NavLink to="/admin" className="sidebar-btn">
-          <FaHome className="me-2" /> Dashboard
-        </NavLink>
 
-        {/* Other links */}
-        <NavLink to="/admin/category" className="sidebar-btn">
+      <div className="sidebar-menu">
+        <Button className="sidebar-btn" onClick={() => navigate("/admin/category")}>
           <FaFolder className="me-2" /> Category
-        </NavLink>
-        <NavLink to="/admin/events" className="sidebar-btn">
+        </Button>
+        <Button className="sidebar-btn" onClick={() => navigate("/admin/events")}>
           <FaClipboardCheck className="me-2" /> Events
-        </NavLink>
-        <NavLink to="/admin/users" className="sidebar-btn">
+        </Button>
+        <Button className="sidebar-btn" onClick={() => navigate("/admin/users")}>
           <FaUsers className="me-2" /> Users
-        </NavLink>
-        <NavLink to="/admin/settings" className="sidebar-btn">
+        </Button>
+        <Button className="sidebar-btn" onClick={() => navigate("/admin/settings")}>
           <FaCog className="me-2" /> Settings
-        </NavLink>
+        </Button>
+      </div>
+
+      {/* ===== Logout Button ===== */}
+      <div className="sidebar-footer">
+        <Button className="logout-btn" onClick={handleLogout}>
+          <FaSignOutAlt className="me-2" /> Logout
+        </Button>
       </div>
     </aside>
   );

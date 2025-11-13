@@ -48,6 +48,8 @@ const Events = () => {
         formDataToSend.append('location', formData.location || '');
         formDataToSend.append('impact_summary', formData.impact_summary || '');
         formDataToSend.append('contact_email', formData.contact_email || '');
+        formDataToSend.append('region', formData.region || '');
+        formDataToSend.append('type', formData.type || '');
 
         // Add image files if any
         if (formData.imageFiles && formData.imageFiles.length > 0) {
@@ -92,6 +94,8 @@ const Events = () => {
         formDataToSend.append('location', formData.location || '');
         formDataToSend.append('impact_summary', formData.impact_summary || '');
         formDataToSend.append('contact_email', formData.contact_email || '');
+        formDataToSend.append('region', formData.region || '');
+        formDataToSend.append('type', formData.type || '');
 
         // Add image files if any
         if (formData.imageFiles && formData.imageFiles.length > 0) {
@@ -103,7 +107,7 @@ const Events = () => {
         const { data, success, error } = await apiCallFormData(
           `http://127.0.0.1:8000/api/climate/event/${currentEvent.event_id}`,
           formDataToSend,
-          { method: 'PUT' }
+          { method: 'POST' }
         );
 
         if (success) {
