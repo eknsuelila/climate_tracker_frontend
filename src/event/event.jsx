@@ -32,7 +32,7 @@ const Event = () => {
         formDataToSend.append('year', year);
       }
 
-      // New required fields
+      // All required fields
       formDataToSend.append('location', formData.location || '');
       formDataToSend.append('impact_summary', formData.impact_summary || '');
       formDataToSend.append('contact_email', formData.contact_email || '');
