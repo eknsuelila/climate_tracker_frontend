@@ -81,3 +81,20 @@
     padding: 1.5rem;
   }
 }
+
+.ai-summary {
+  grid-column: span 3;
+  background: rgba(20, 25, 40, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.2);
+  color: #d8e6f3;
+  font-size: 1rem;
+}
+
+.ai-summary h3 {
+  color: #00c8ff;
+  margin-bottom: 10px;
+  text-align: left;
+}
