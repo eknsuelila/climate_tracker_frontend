@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "../service/api.js";
+import { generateAnalyticsSummary } from "../service/geminiService.js"; // 🧠 Gemini integration
 import {
   BarChart,
   Bar,
@@ -17,14 +18,16 @@ import "./analytics.css";
 
 const Analytics = () => {
   const [eventData, setEventData] = useState([]);
-  const [impactData, setImpactData] = useState([]); // ✅ Now fetched from API
+  const [impactData, setImpactData] = useState([]);
   const [regions, setRegions] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState("Thompson-Okanagan");
   const [loading, setLoading] = useState(true);
+  const [aiSummary, setAiSummary] = useState(""); // 🧠 AI summary state
+  const [aiLoading, setAiLoading] = useState(false); // 🧠 Loading state for AI
 
   const COLORS = ["#3ebfff", "#66d9ff", "#a6e3ff", "#33a3ff"];
 
-  // ✅ Fetch list of regions from API
+  // ✅ Fetch list of regions
   useEffect(() => {
     const fetchRegions = async () => {
       try {
@@ -40,7 +43,7 @@ const Analytics = () => {
     fetchRegions();
   }, []);
 
-  // ✅ Fetch event frequency data
+  // ✅ Fetch event frequency
   useEffect(() => {
     const fetchEventData = async () => {
       setLoading(true);
@@ -60,11 +63,10 @@ const Analytics = () => {
         setLoading(false);
       }
     };
-
     fetchEventData();
   }, [selectedRegion]);
 
-  // ✅ Fetch severity data (replaces hardcoded impactData)
+  // ✅ Fetch severity
   useEffect(() => {
     const fetchSeverityData = async () => {
       try {
@@ -72,16 +74,32 @@ const Analytics = () => {
         if (!res.ok) throw new Error("Failed to fetch severity data");
 
         const data = await res.json();
-        // Convert { "Low": 10, "Moderate": 5, "High": 2 } → [{ name: "Low", value: 10 }, ...]
         const formatted = Object.entries(data).map(([name, value]) => ({ name, value }));
         setImpactData(formatted);
       } catch (err) {
         console.error("Error fetching severity data:", err);
       }
     };
-
     fetchSeverityData();
   }, [selectedRegion]);
+
+  // 🧠 Generate AI summary whenever data changes
+  useEffect(() => {
+    const getAISummary = async () => {
+      if (eventData.length === 0 && impactData.length === 0) return;
+      setAiLoading(true);
+      try {
+        const summary = await generateAnalyticsSummary(selectedRegion, eventData, impactData);
+        setAiSummary(summary);
+      } catch (err) {
+        console.error("Gemini summary error:", err);
+        setAiSummary("AI summary unavailable.");
+      } finally {
+        setAiLoading(false);
+      }
+    };
+    getAISummary();
+  }, [selectedRegion, eventData, impactData]);
 
   return (
     <div className="analytics-page">
@@ -89,7 +107,7 @@ const Analytics = () => {
         <h1>Climate Analytics Dashboard</h1>
         <p>Explore data-driven insights about environmental events across British Columbia.</p>
 
-        {/* ✅ Region Selector */}
+        {/* Region Selector */}
         <div className="region-selector">
           <select
             id="region-select"
@@ -107,9 +125,7 @@ const Analytics = () => {
                 <option value="Thompson-Okanagan">Thompson-Okanagan</option>
                 <option value="Northern BC">Northern BC</option>
                 <option value="Lower Mainland">Lower Mainland</option>
-                <option value="Vancouver Island & Coast">
-                  Vancouver Island & Coast
-                </option>
+                <option value="Vancouver Island & Coast">Vancouver Island & Coast</option>
                 <option value="Kootenay/Columbia">Kootenay/Columbia</option>
               </>
             )}
@@ -121,7 +137,7 @@ const Analytics = () => {
         <p>Loading analytics data...</p>
       ) : (
         <div className="analytics-grid">
-          {/* Chart 1 - Bar Chart for Event Frequency */}
+          {/* Chart 1 */}
           <div className="chart-card">
             <h3>Event Frequency by Category ({selectedRegion})</h3>
             {eventData.length === 0 ? (
@@ -145,7 +161,7 @@ const Analytics = () => {
             )}
           </div>
 
-          {/* Chart 2 - Pie Chart for Severity (API data) */}
+          {/* Chart 2 */}
           <div className="chart-card">
             <h3>Event Severity Distribution ({selectedRegion})</h3>
             {impactData.length === 0 ? (
@@ -179,7 +195,7 @@ const Analytics = () => {
             )}
           </div>
 
-          {/* Chart 3 - Summary Stats */}
+          {/* Quick Stats */}
           <div className="stats-card">
             <h3>Quick Statistics</h3>
             <ul>
@@ -200,6 +216,12 @@ const Analytics = () => {
                 <span>Data Updated:</span> November 2025
               </li>
             </ul>
+          </div>
+
+          {/* 🧠 Gemini AI Summary */}
+          <div className="ai-summary">
+            <h3>AI-Generated Insight</h3>
+            {aiLoading ? <p>Generating summary...</p> : <p>{aiSummary}</p>}
           </div>
         </div>
       )}
