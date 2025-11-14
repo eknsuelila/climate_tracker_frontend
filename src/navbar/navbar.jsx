@@ -15,6 +15,7 @@ const Navbar = () => {
     <div className="navbar-main shadow-sm py-3 px-4">
       <Container fluid>
         <Row className="align-items-center justify-content-between">
+
           {/* Logo */}
           <Col xs="auto">
             <Link to="/" className="navbar-logo text-decoration-none">
@@ -62,6 +63,16 @@ const Navbar = () => {
             >
               ABOUT&nbsp;US
             </NavLink>
+
+            {/* ⭐ CONTACT PAGE LINK ADDED HERE */}
+            <NavLink
+              to="/contact"
+              className={({ isActive }) =>
+                "nav-item" + (isActive ? " active" : "")
+              }
+            >
+              CONTACT
+            </NavLink>
           </Col>
 
           {/* Buttons */}
@@ -99,6 +110,7 @@ const Navbar = () => {
               </Button>
             )}
           </Col>
+
         </Row>
       </Container>
     </div>
