@@ -15,6 +15,8 @@ import Profile from "./profile/profile";
 import EditProfile from "./profile/editProfile/editProfile";
 import AdminOnlyRoute from "./components/AdminOnlyRoute";
 import AboutUs from "./aboutus/AboutUs";
+import Contacts from "./contacts/contacts";
+
 
 
 // Admin pages
@@ -53,6 +55,7 @@ const App = () => {
           <Route path="/reset" element={<PasswordResetPage />} />
           <Route path="/reset-password" element={<PasswordUpdate />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<Contacts />} />
 
 
           {/* Admin Pages with sidebar */}
