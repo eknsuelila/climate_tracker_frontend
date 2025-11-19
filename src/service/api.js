@@ -25,6 +25,9 @@ export const API_ENDPOINTS = {
   // User endpoints
   USER_PROFILE: `${API_BASE_URL}/user/profile`,
 
+  //contact 
+  CONTACT :  `${API_BASE_URL}/contact`,
+
   //user management 
   USER_MANAGEMENT : `${API_BASE_URL}/user/manage`,
   
