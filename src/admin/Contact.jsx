@@ -21,13 +21,16 @@ const AdminContacts = () => {
   const [filteredContacts, setFilteredContacts] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
   const [showModal, setShowModal] = useState(false);
   const [currentContact, setCurrentContact] = useState(null);
 
-  // Filters
-  const [statusFilter, setStatusFilter] = useState("All"); // All / Pending / Resolved
-  const [deletedFilter, setDeletedFilter] = useState("All"); // All / Active / Deleted
-  const [sortOrder, setSortOrder] = useState("Newest");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [deletedFilter, setDeletedFilter] = useState("all");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   // Fetch all contacts
   const fetchContacts = async () => {
@@ -35,20 +38,12 @@ const AdminContacts = () => {
     const { data, success } = await apiCall(API_ENDPOINTS.CONTACT);
 
     if (success) {
-      const mapped = data.map((c) => ({
-        id: c.id,
-        name: c.name,
-        email: c.email,
-        subject: c.subject,
-        message: c.message,
-        status: c.status,
-        created_at: new Date(c.created_at),
-        updated_at: new Date(c.updated_at),
-        is_deleted: c.is_deleted,
-      }));
+      const sorted = data.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
 
-      setContacts(mapped);
-      setFilteredContacts(mapped);
+      setContacts(sorted);
+      setFilteredContacts(sorted);
     } else {
       toast.error("❌ Failed to fetch contacts");
     }
@@ -59,40 +54,33 @@ const AdminContacts = () => {
     fetchContacts();
   }, []);
 
-  // Apply Filters + Sorting
+  // Apply filters
   useEffect(() => {
-    let result = [...contacts];
+    let list = contacts;
 
-    // Filter by Status
-    if (statusFilter !== "All") {
-      result = result.filter((c) =>
-        statusFilter === "Resolved" ? c.status === true : c.status === false
+    if (statusFilter !== "all") {
+      list = list.filter((c) =>
+        statusFilter === "resolved" ? c.status === true : c.status === false
       );
     }
 
-    // Filter by Deleted
-    if (deletedFilter === "Active") {
-      result = result.filter((c) => c.is_deleted === false);
-    } else if (deletedFilter === "Deleted") {
-      result = result.filter((c) => c.is_deleted === true);
+    if (deletedFilter !== "all") {
+      list = list.filter((c) =>
+        deletedFilter === "deleted" ? c.is_deleted === true : c.is_deleted === false
+      );
     }
 
-    // Sorting
-    result.sort((a, b) =>
-      sortOrder === "Newest"
-        ? b.created_at - a.created_at
-        : a.created_at - b.created_at
-    );
+    setFilteredContacts(list);
+    setCurrentPage(1);
+  }, [statusFilter, deletedFilter, contacts]);
 
-    setFilteredContacts(result);
-  }, [statusFilter, deletedFilter, sortOrder, contacts]);
-
-  // Modal
+  // Open modal
   const openModal = (contact) => {
     setCurrentContact(contact);
     setShowModal(true);
   };
 
+  // Close modal
   const closeModal = () => {
     setShowModal(false);
     setCurrentContact(null);
@@ -119,7 +107,6 @@ const AdminContacts = () => {
           c.id === currentContact.id ? { ...c, status: data.status } : c
         )
       );
-
       toast.success("Status updated");
       closeModal();
     } else {
@@ -127,7 +114,7 @@ const AdminContacts = () => {
     }
   };
 
-  // Delete
+  // Delete contact
   const deleteContact = async (id) => {
     const { success } = await apiCall(`${API_ENDPOINTS.CONTACT}/${id}`, {
       method: "DELETE",
@@ -141,12 +128,21 @@ const AdminContacts = () => {
     }
   };
 
+  // Pagination calculations
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentItems = filteredContacts.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
   return (
     <div className="admin-page">
       <ToastContainer />
 
       <Container className="admin-main">
-
         <Row className="mb-4">
           <Col>
             <Card className="admin-card text-center p-4">
@@ -156,16 +152,16 @@ const AdminContacts = () => {
           </Col>
         </Row>
 
-        {/* Filters */}
+        {/* FILTERS */}
         <Row className="mb-3">
           <Col md={4}>
             <Form.Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="All">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Resolved">Resolved</option>
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="resolved">Resolved</option>
             </Form.Select>
           </Col>
 
@@ -174,28 +170,19 @@ const AdminContacts = () => {
               value={deletedFilter}
               onChange={(e) => setDeletedFilter(e.target.value)}
             >
-              <option value="All">All Contacts</option>
-              <option value="Active">Active Only</option>
-              <option value="Deleted">Deleted Only</option>
-            </Form.Select>
-          </Col>
-
-          <Col md={4}>
-            <Form.Select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="Newest">Newest First</option>
-              <option value="Oldest">Oldest First</option>
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="deleted">Deleted</option>
             </Form.Select>
           </Col>
         </Row>
 
+        {/* TABLE */}
         <Row>
           <Col>
             <Card className="admin-card p-4">
               <h5 className="text-center mb-3">
-                All Contacts ({filteredContacts.length})
+                Contacts ({filteredContacts.length})
               </h5>
 
               <Table striped bordered hover responsive className="text-center">
@@ -216,32 +203,27 @@ const AdminContacts = () => {
                     <tr>
                       <td colSpan={7}>Loading...</td>
                     </tr>
-                  ) : filteredContacts.length === 0 ? (
+                  ) : currentItems.length === 0 ? (
                     <tr>
                       <td colSpan={7}>No contacts found</td>
                     </tr>
                   ) : (
-                    filteredContacts.map((c, index) => (
+                    currentItems.map((c, index) => (
                       <tr key={c.id}>
-                        <td>{index + 1}</td>
+                        <td>{indexOfFirst + index + 1}</td>
                         <td>{c.name}</td>
                         <td>{c.email}</td>
                         <td>{c.subject}</td>
-
                         <td>
                           <Badge bg={c.status ? "success" : "secondary"}>
                             {c.status ? "Resolved" : "Pending"}
                           </Badge>
                         </td>
-
                         <td>
-                          {c.is_deleted ? (
-                            <Badge bg="danger">Deleted</Badge>
-                          ) : (
-                            <Badge bg="primary">Active</Badge>
-                          )}
+                          <Badge bg={c.is_deleted ? "danger" : "info"}>
+                            {c.is_deleted ? "Deleted" : "Active"}
+                          </Badge>
                         </td>
-
                         <td>
                           <Button
                             variant="outline-primary"
@@ -265,12 +247,35 @@ const AdminContacts = () => {
                   )}
                 </tbody>
               </Table>
+
+              {/* PAGINATION */}
+              <div className="d-flex justify-content-between align-items-center mt-3">
+                <Button
+                  variant="secondary"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Previous
+                </Button>
+
+                <div>
+                  Page {currentPage} of {totalPages}
+                </div>
+
+                <Button
+                  variant="secondary"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </Button>
+              </div>
             </Card>
           </Col>
         </Row>
       </Container>
 
-      {/* Modal */}
+      {/* MODAL */}
       <Modal show={showModal} onHide={closeModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Contact Details</Modal.Title>
@@ -292,7 +297,7 @@ const AdminContacts = () => {
                 <strong>Message:</strong> {currentContact.message}
               </p>
 
-              <Form.Group>
+              <Form.Group className="mt-3">
                 <Form.Label>Status</Form.Label>
                 <Form.Select
                   value={currentContact.status ? "Resolved" : "Pending"}

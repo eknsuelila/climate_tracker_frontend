@@ -1,8 +1,9 @@
 import React from "react";
 import { Button } from "react-bootstrap";
-import { FaFolder, FaClipboardCheck, FaUsers, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaFolder, FaClipboardCheck, FaUsers, FaCog, FaSignOutAlt, FaMailBulk, FaMailchimp, FaTextHeight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./admin.css";
+import { FaMessage, FaRegMessage, FaSignalMessenger } from "react-icons/fa6";
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const AdminSidebar = () => {
           <FaUsers className="me-2" /> Users
         </Button>
         <Button className="sidebar-btn" onClick={() => navigate("/admin/contact")}>
-          <FaUsers className="me-2" /> Contacts
+          <FaMessage className="me-2" /> Contacts
         </Button>
         <Button className="sidebar-btn" onClick={() => navigate("/admin/settings")}>
           <FaCog className="me-2" /> Settings
