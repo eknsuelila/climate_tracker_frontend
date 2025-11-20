@@ -30,6 +30,9 @@ const AdminSidebar = () => {
         <Button className="sidebar-btn" onClick={() => navigate("/admin/users")}>
           <FaUsers className="me-2" /> Users
         </Button>
+        <Button className="sidebar-btn" onClick={() => navigate("/admin/contact")}>
+          <FaUsers className="me-2" /> Contacts
+        </Button>
         <Button className="sidebar-btn" onClick={() => navigate("/admin/settings")}>
           <FaCog className="me-2" /> Settings
         </Button>
