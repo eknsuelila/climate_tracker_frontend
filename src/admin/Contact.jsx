@@ -19,14 +19,12 @@ import "./admin.css";
 const AdminContacts = () => {
   const [contacts, setContacts] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
-
   const [loading, setLoading] = useState(false);
-
   const [showModal, setShowModal] = useState(false);
   const [currentContact, setCurrentContact] = useState(null);
-
   const [statusFilter, setStatusFilter] = useState("all");
   const [deletedFilter, setDeletedFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState(""); // <-- Search state
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,7 +52,7 @@ const AdminContacts = () => {
     fetchContacts();
   }, []);
 
-  // Apply filters
+  // Apply filters & search
   useEffect(() => {
     let list = contacts;
 
@@ -70,9 +68,19 @@ const AdminContacts = () => {
       );
     }
 
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.name.toLowerCase().includes(term) ||
+          c.email.toLowerCase().includes(term) ||
+          c.subject.toLowerCase().includes(term)
+      );
+    }
+
     setFilteredContacts(list);
     setCurrentPage(1);
-  }, [statusFilter, deletedFilter, contacts]);
+  }, [statusFilter, deletedFilter, searchTerm, contacts]);
 
   // Open modal
   const openModal = (contact) => {
@@ -152,9 +160,9 @@ const AdminContacts = () => {
           </Col>
         </Row>
 
-        {/* FILTERS */}
+        {/* FILTERS + SEARCH */}
         <Row className="mb-3">
-          <Col md={4}>
+          <Col md={3}>
             <Form.Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -165,7 +173,7 @@ const AdminContacts = () => {
             </Form.Select>
           </Col>
 
-          <Col md={4}>
+          <Col md={3}>
             <Form.Select
               value={deletedFilter}
               onChange={(e) => setDeletedFilter(e.target.value)}
@@ -174,6 +182,15 @@ const AdminContacts = () => {
               <option value="active">Active</option>
               <option value="deleted">Deleted</option>
             </Form.Select>
+          </Col>
+
+          <Col md={4}>
+            <Form.Control
+              type="text"
+              placeholder="Search by name, email, or subject..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </Col>
         </Row>
 

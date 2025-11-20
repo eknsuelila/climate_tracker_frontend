@@ -20,7 +20,8 @@ import "./admin.css";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("All"); // New filter state
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState(""); // <-- New search state
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState({
     name: "",
@@ -46,7 +47,7 @@ const Users = () => {
         status: u.status,
       }));
       setUsers(mappedUsers);
-      setFilteredUsers(mappedUsers); // Initialize filtered users
+      setFilteredUsers(mappedUsers);
     } else {
       toast.error(`❌ Failed to fetch users: ${error}`);
     }
@@ -57,17 +58,26 @@ const Users = () => {
     fetchUsers();
   }, []);
 
-  // Filter users when statusFilter changes
+  // Filter & search users
   useEffect(() => {
-    if (statusFilter === "All") {
-      setFilteredUsers(users);
-    } else if (statusFilter === "Active") {
-      setFilteredUsers(users.filter((u) => u.status));
-    } else {
-      setFilteredUsers(users.filter((u) => !u.status));
+    let tempUsers = [...users];
+
+    // Status filter
+    if (statusFilter === "Active") tempUsers = tempUsers.filter((u) => u.status);
+    else if (statusFilter === "Inactive") tempUsers = tempUsers.filter((u) => !u.status);
+
+    // Search filter
+    if (searchTerm.trim() !== "") {
+      tempUsers = tempUsers.filter(
+        (u) =>
+          u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          u.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-    setCurrentPage(1); // Reset to first page
-  }, [statusFilter, users]);
+
+    setFilteredUsers(tempUsers);
+    setCurrentPage(1); // reset pagination when filter/search changes
+  }, [statusFilter, searchTerm, users]);
 
   const handleClose = () => {
     setShowModal(false);
@@ -157,14 +167,24 @@ const Users = () => {
             <Card className="admin-card p-4">
               <h5 className="text-center mb-3">All Users ({filteredUsers.length})</h5>
 
-              {/* Status Filter */}
-              <Form.Group controlId="statusFilter" className="mb-3 w-25 mx-auto">
-                <Form.Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                  <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </Form.Select>
-              </Form.Group>
+              {/* Filters */}
+              <Row className="mb-3 justify-content-center">
+                <Col md={3}>
+                  <Form.Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                    <option value="All">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </Form.Select>
+                </Col>
+                <Col md={4}>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </Col>
+              </Row>
 
               <Table striped bordered hover responsive className="text-center align-middle">
                 <thead>
@@ -189,9 +209,7 @@ const Users = () => {
                     paginatedUsers.map((u, index) => (
                       <tr key={u.id}>
                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>
-                          <strong>{u.name}</strong>
-                        </td>
+                        <td><strong>{u.name}</strong></td>
                         <td>{u.email}</td>
                         <td>
                           <Badge bg={u.status ? "success" : "secondary"}>
