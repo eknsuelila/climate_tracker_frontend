@@ -8,7 +8,13 @@ import "./admin.css";
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Filter States
+  const [statusFilter, setStatusFilter] = useState("All"); // All / Active / Deactivated
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("Newest"); // Newest / Oldest / A-Z / Z-A
 
   // Modal States
   const [showModal, setShowModal] = useState(false);
@@ -31,11 +37,56 @@ const Category = () => {
     const { data, success, error } = await apiCall(API_ENDPOINTS.CATEGORIES);
     if (success) {
       setCategories(data);
+      setFilteredCategories(data);
     } else {
       toast.error(`❌ Failed to fetch categories: ${error}`);
     }
     setLoading(false);
   };
+
+  // Apply Filters + Sorting
+  useEffect(() => {
+    let result = [...categories];
+
+    // Filter by Status
+    if (statusFilter !== "All") {
+      result = result.filter((cat) => {
+        if (statusFilter === "Active") {
+          return cat.status === 1;
+        } else if (statusFilter === "Deactivated") {
+          return cat.status === 2;
+        }
+        return true;
+      });
+    }
+
+    // Filter by Search Query (title or description)
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (cat) =>
+          cat.title.toLowerCase().includes(query) ||
+          cat.description.toLowerCase().includes(query)
+      );
+    }
+
+    // Sorting
+    result.sort((a, b) => {
+      if (sortOrder === "Newest") {
+        // Assuming categories have created_at or use category_id as fallback
+        return (b.category_id || 0) - (a.category_id || 0);
+      } else if (sortOrder === "Oldest") {
+        return (a.category_id || 0) - (b.category_id || 0);
+      } else if (sortOrder === "A-Z") {
+        return a.title.localeCompare(b.title);
+      } else if (sortOrder === "Z-A") {
+        return b.title.localeCompare(a.title);
+      }
+      return 0;
+    });
+
+    setFilteredCategories(result);
+  }, [statusFilter, searchQuery, sortOrder, categories]);
 
   // Handle form input
   const handleChange = (e) => {
@@ -154,12 +205,66 @@ const Category = () => {
           </Col>
         </Row>
 
+        {/* Filters */}
+        <Row className="mb-3">
+          <Col md={3}>
+            <Form.Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Deactivated">Deactivated</option>
+            </Form.Select>
+          </Col>
+
+          <Col md={6}>
+            <Form.Control
+              type="text"
+              placeholder="Search by title or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </Col>
+
+          <Col md={3}>
+            <Form.Select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="Newest">Newest First</option>
+              <option value="Oldest">Oldest First</option>
+              <option value="A-Z">Title A-Z</option>
+              <option value="Z-A">Title Z-A</option>
+            </Form.Select>
+          </Col>
+
+          <Col md={12} className="mt-2">
+            {(statusFilter !== "All" || searchQuery.trim() !== "") && (
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  setStatusFilter("All");
+                  setSearchQuery("");
+                  setSortOrder("Newest");
+                }}
+              >
+                Clear Filters
+              </Button>
+            )}
+          </Col>
+        </Row>
+
         {/* Table */}
         <Row>
           <Col>
             <Card className="admin-card">
               <Card.Header>
-                <h5>All Categories ({categories.length})</h5>
+                <h5>
+                  All Categories ({filteredCategories.length}
+                  {filteredCategories.length !== categories.length &&
+                    ` of ${categories.length}`})
+                </h5>
               </Card.Header>
               <Card.Body>
                 {loading ? (
@@ -168,9 +273,13 @@ const Category = () => {
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
-                ) : categories.length === 0 ? (
+                ) : filteredCategories.length === 0 ? (
                   <div className="text-center p-4">
-                    <p>No categories found.</p>
+                    <p>
+                      {categories.length === 0
+                        ? "No categories found."
+                        : "No categories match your filters."}
+                    </p>
                   </div>
                 ) : (
                   <div className="table-responsive">
@@ -184,7 +293,7 @@ const Category = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {categories.map((cat) => (
+                        {filteredCategories.map((cat) => (
                           <tr key={cat.category_id}>
                             <td><strong>{cat.title}</strong></td>
                             <td>{cat.description}</td>
