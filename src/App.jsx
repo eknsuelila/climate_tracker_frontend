@@ -24,6 +24,7 @@ import AdminLayout from "./admin/AdminLayout";
 import Category from "./admin/Category";
 import Events from "./admin/Events";
 import Users from "./admin/Users";
+import AdminContacts from "./admin/Contact";
 import Settings from "./admin/Settings";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -68,6 +69,7 @@ const App = () => {
             <Route path="category" element={<Category />} />
             <Route path="events" element={<Events />} />
             <Route path="users" element={<Users />} />
+            <Route path="contact" element={<AdminContacts />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

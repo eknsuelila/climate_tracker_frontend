@@ -3,7 +3,6 @@ import "./contacts.css";
 import { toast } from "react-toastify";
 import { API_ENDPOINTS } from "../service/api.js";
 
-
 const Contacts = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -28,6 +27,8 @@ const Contacts = () => {
     }
 
     try {
+      const now = new Date().toISOString();
+
       const res = await fetch(API_ENDPOINTS.CONTACT, {
         method: "POST",
         headers: {
@@ -35,7 +36,10 @@ const Contacts = () => {
         },
         body: JSON.stringify({
           ...formData,
-          status: true,
+          status: false,
+          created_at: now,
+          updated_at: now,
+          is_deleted: false,
         }),
       });
 
