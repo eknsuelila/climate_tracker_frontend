@@ -9,6 +9,7 @@ import {
   Modal,
   Form,
   Badge,
+  Pagination,
 } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,6 +19,9 @@ import "./admin.css";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState(""); // <-- New search state
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState({
     name: "",
@@ -27,19 +31,23 @@ const Users = () => {
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   // Fetch users from backend
   const fetchUsers = async () => {
     setLoading(true);
     const { data, success, error } = await apiCall(API_ENDPOINTS.USER_MANAGEMENT);
     if (success) {
-      setUsers(
-        data.map((u) => ({
-          id: u.user_id,
-          name: u.username,
-          email: u.email,
-          status: u.status,
-        }))
-      );
+      const mappedUsers = data.map((u) => ({
+        id: u.user_id,
+        name: u.username,
+        email: u.email,
+        status: u.status,
+      }));
+      setUsers(mappedUsers);
+      setFilteredUsers(mappedUsers);
     } else {
       toast.error(`❌ Failed to fetch users: ${error}`);
     }
@@ -49,6 +57,27 @@ const Users = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Filter & search users
+  useEffect(() => {
+    let tempUsers = [...users];
+
+    // Status filter
+    if (statusFilter === "Active") tempUsers = tempUsers.filter((u) => u.status);
+    else if (statusFilter === "Inactive") tempUsers = tempUsers.filter((u) => !u.status);
+
+    // Search filter
+    if (searchTerm.trim() !== "") {
+      tempUsers = tempUsers.filter(
+        (u) =>
+          u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          u.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredUsers(tempUsers);
+    setCurrentPage(1); // reset pagination when filter/search changes
+  }, [statusFilter, searchTerm, users]);
 
   const handleClose = () => {
     setShowModal(false);
@@ -77,13 +106,10 @@ const Users = () => {
     });
 
     if (success) {
-      setUsers(
-        users.map((u) =>
-          u.id === editId
-            ? { ...u, name: data.username, email: data.email, status: data.status }
-            : u
-        )
+      const updatedUsers = users.map((u) =>
+        u.id === editId ? { ...u, name: data.username, email: data.email, status: data.status } : u
       );
+      setUsers(updatedUsers);
       toast.success("✅ User updated successfully");
       handleClose();
     } else {
@@ -99,15 +125,26 @@ const Users = () => {
     });
 
     if (success) {
-      setUsers(
-        users.map((u) =>
-          u.id === id ? { ...u, status: data.status } : u
-        )
+      const updatedUsers = users.map((u) =>
+        u.id === id ? { ...u, status: data.status } : u
       );
+      setUsers(updatedUsers);
       toast.success("✅ User status updated");
     } else {
       toast.error(`❌ Failed to update status: ${error}`);
     }
+  };
+
+  // Pagination helpers
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
   return (
@@ -128,16 +165,28 @@ const Users = () => {
         <Row>
           <Col>
             <Card className="admin-card p-4">
-              <h5 className="text-center mb-3">
-                All Users ({users.length})
-              </h5>
-              <Table
-                striped
-                bordered
-                hover
-                responsive
-                className="text-center align-middle"
-              >
+              <h5 className="text-center mb-3">All Users ({filteredUsers.length})</h5>
+
+              {/* Filters */}
+              <Row className="mb-3 justify-content-center">
+                <Col md={3}>
+                  <Form.Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                    <option value="All">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </Form.Select>
+                </Col>
+                <Col md={4}>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </Col>
+              </Row>
+
+              <Table striped bordered hover responsive className="text-center align-middle">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -152,17 +201,15 @@ const Users = () => {
                     <tr>
                       <td colSpan={5}>Loading...</td>
                     </tr>
-                  ) : users.length === 0 ? (
+                  ) : paginatedUsers.length === 0 ? (
                     <tr>
                       <td colSpan={5}>No users found</td>
                     </tr>
                   ) : (
-                    users.map((u, index) => (
+                    paginatedUsers.map((u, index) => (
                       <tr key={u.id}>
-                        <td>{index + 1}</td>
-                        <td>
-                          <strong>{u.name}</strong>
-                        </td>
+                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td><strong>{u.name}</strong></td>
                         <td>{u.email}</td>
                         <td>
                           <Badge bg={u.status ? "success" : "secondary"}>
@@ -192,6 +239,21 @@ const Users = () => {
                   )}
                 </tbody>
               </Table>
+
+              {/* Pagination UI */}
+              <Pagination className="justify-content-center mt-3">
+                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                {[...Array(totalPages)].map((_, index) => (
+                  <Pagination.Item
+                    key={index + 1}
+                    active={currentPage === index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </Pagination.Item>
+                ))}
+                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+              </Pagination>
             </Card>
           </Col>
         </Row>
