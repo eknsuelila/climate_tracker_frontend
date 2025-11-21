@@ -12,6 +12,8 @@ export const getAuthHeaders = () => {
 
 // API endpoints
 export const API_ENDPOINTS = {
+
+  FEATURED_EVENTS : `${API_BASE_URL}/featured`,
   // Auth endpoints
   LOGIN: `${API_BASE_URL}/auth/login`,
   REGISTER: `${API_BASE_URL}/auth/register`,

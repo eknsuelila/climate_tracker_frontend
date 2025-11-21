@@ -1,8 +1,29 @@
-import React from "react";
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Card, Carousel } from "react-bootstrap";
 import "./home.css";
+import { API_ENDPOINTS } from "../service/api.js";
 
 const Home = () => {
+  const [featuredEvents, setFeaturedEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedEvents = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.FEATURED_EVENTS);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        setFeaturedEvents(data);
+      } catch (error) {
+        console.error("Error fetching featured events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedEvents();
+  }, []);
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -35,23 +56,49 @@ const Home = () => {
       <div className="featured-section">
         <Container>
           <h6 className="text-primary fw-bold mb-3">FEATURED EVENTS</h6>
-          <Row className="gy-3 gx-3 justify-content-center">
-            <Col xs={12} md={3}>
-              <Card className="event-card">
-                <Card.Body>1980: Hecate Strait Oil Spill</Card.Body>
-              </Card>
-            </Col>
-            <Col xs={12} md={3}>
-              <Card className="event-card">
-                <Card.Body>1997: Pine Beetle Infestation</Card.Body>
-              </Card>
-            </Col>
-            <Col xs={12} md={3}>
-              <Card className="event-card">
-                <Card.Body>2021: Lytton Heatwave</Card.Body>
-              </Card>
-            </Col>
-          </Row>
+
+          {loading ? (
+            <p>Loading featured events...</p>
+          ) : (
+            <Row className="gy-3 gx-3 justify-content-center">
+              {featuredEvents.map((event) => (
+                <Col key={event.event_id} xs={12} md={4}>
+                  <Card className="event-card h-100" style={{ height: "400px" }}>
+                    {/* Year as top title */}
+                    <Card.Header className="fw-bold text-primary text-center">
+                      {event.year}
+                    </Card.Header>
+
+                    {/* Carousel for multiple images */}
+                    {event.image_urls && event.image_urls.length > 0 && (
+                      <Carousel variant="dark">
+                        {event.image_urls.map((url, index) => (
+                          <Carousel.Item key={index}>
+                            <img
+                              className="d-block w-100"
+                              src={url}
+                              alt={`${event.title} image ${index + 1}`}
+                              style={{ height: "180px", objectFit: "cover" }}
+                            />
+                          </Carousel.Item>
+                        ))}
+                      </Carousel>
+                    )}
+
+                    <Card.Body style={{ overflow: "hidden" }}>
+                      <h6 className="fw-semibold">{event.title}</h6>
+                      <p className="text-muted small" style={{ maxHeight: "50px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {event.impact_summary}
+                      </p>
+                      <p className="small text-secondary mb-0">
+                        {event.location} | Severity: {event.severity}
+                      </p>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
         </Container>
       </div>
     </div>
