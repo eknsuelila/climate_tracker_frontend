@@ -1,5 +1,6 @@
 // API configuration and utilities
-const API_BASE_URL = 'http://127.0.0.1:8000/api/climate';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/climate';
+const IS_DEV = import.meta.env.DEV;
 
 // Helper function to get auth headers
 export const getAuthHeaders = () => {
@@ -35,7 +36,11 @@ export const API_ENDPOINTS = {
   
   // Event endpoints
   EVENTS: `${API_BASE_URL}/event/`,
+  EVENTS_ALL: `${API_BASE_URL}/event/all`, // All events for map (no pagination)
   EVENT_BY_ID: (id) => `${API_BASE_URL}/event/${id}`,
+  EVENT_APPROVE: (id) => `${API_BASE_URL}/event/${id}/approve`,
+  EVENT_FEATURE: (id) => `${API_BASE_URL}/event/${id}/feature`,
+  EVENT_ADD: `${API_BASE_URL}/event/add`,
   
   // Category endpoints
   CATEGORIES: `${API_BASE_URL}/category`,
@@ -60,6 +65,9 @@ export const API_ENDPOINTS = {
   CLIMATE_SEVERITY: (region) =>
   `${API_BASE_URL}/climate/severity?region=${encodeURIComponent(region)}`,
 
+  // About endpoint
+  ABOUT: `${import.meta.env.VITE_API_BASE_URL?.replace('/api/climate', '') || 'http://127.0.0.1:8000'}/about`,
+
 };
 
 // Generic API call helper
@@ -78,15 +86,23 @@ export const apiCall = async (url, options = {}) => {
   };
   
   try {
-    console.log('ðŸŒ Making API call to:', url);
-    console.log('ðŸ“‹ Request config:', config);
+    if (IS_DEV) {
+      console.log('🌐 Making API call to:', url);
+      console.log('📋 Request config:', config);
+    }
     
     const response = await fetch(url, config);
-    console.log('ðŸ“Š Response status:', response.status);
-    console.log('ðŸ“Š Response ok:', response.ok);
+    
+    if (IS_DEV) {
+      console.log('📊 Response status:', response.status);
+      console.log('📊 Response ok:', response.ok);
+    }
     
     const data = await response.json();
-    console.log('ðŸ“‹ Response data:', data);
+    
+    if (IS_DEV) {
+      console.log('📋 Response data:', data);
+    }
     
     if (!response.ok) {
       throw new Error(data.detail || `HTTP error! status: ${response.status}`);
@@ -94,7 +110,9 @@ export const apiCall = async (url, options = {}) => {
     
     return { data, success: true };
   } catch (error) {
-    console.error('API call failed:', error);
+    if (IS_DEV) {
+      console.error('API call failed:', error);
+    }
     return { error: error.message, success: false };
   }
 };
@@ -117,15 +135,23 @@ export const publicApiCall = async (url, options = {}) => {
   };
   
   try {
-    console.log('ðŸŒ Making public API call to:', url);
-    console.log('ðŸ“‹ Request config:', config);
+    if (IS_DEV) {
+      console.log('🌐 Making public API call to:', url);
+      console.log('📋 Request config:', config);
+    }
     
     const response = await fetch(url, config);
-    console.log('ðŸ“Š Response status:', response.status);
-    console.log('ðŸ“Š Response ok:', response.ok);
+    
+    if (IS_DEV) {
+      console.log('📊 Response status:', response.status);
+      console.log('📊 Response ok:', response.ok);
+    }
     
     const data = await response.json();
-    console.log('ðŸ“‹ Response data:', data);
+    
+    if (IS_DEV) {
+      console.log('📋 Response data:', data);
+    }
     
     if (!response.ok) {
       throw new Error(data.detail || `HTTP error! status: ${response.status}`);
@@ -133,7 +159,9 @@ export const publicApiCall = async (url, options = {}) => {
     
     return { data, success: true };
   } catch (error) {
-    console.error('Public API call failed:', error);
+    if (IS_DEV) {
+      console.error('Public API call failed:', error);
+    }
     return { error: error.message, success: false };
   }
 };
@@ -162,7 +190,9 @@ export const apiCallFormData = async (url, formData, options = {}) => {
     
     return { data, success: true };
   } catch (error) {
-    console.error('API call failed:', error);
+    if (IS_DEV) {
+      console.error('API call failed:', error);
+    }
     return { error: error.message, success: false };
   }
 };

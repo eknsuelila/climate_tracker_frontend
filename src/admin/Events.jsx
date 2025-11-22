@@ -10,22 +10,26 @@ import {
   Badge,
   Alert,
   Pagination,
+  Spinner,
 } from "react-bootstrap";
 import { FaPlus, FaEdit, FaTrash, FaEye, FaCheck, FaStar } from "react-icons/fa";
-import { API_ENDPOINTS, apiCall, publicApiCall } from "../service/api.js";
+import { useQueryClient } from "@tanstack/react-query";
+import { API_ENDPOINTS, apiCall } from "../service/api.js";
+import { useCategoriesCached } from "../hooks/useCategoriesCached.js";
+import { useEventsPaginatedCached } from "../hooks/useEventsCached.js";
 import EventForm from "../components/EventForm.jsx";
 import "./admin.css";
 
 const Events = () => {
-  const [events, setEvents] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const [loading, setLoading] = useState(false); // For form submission
+  const [loadingActions, setLoadingActions] = useState({}); // Track per-action loading states
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 20; // Increased for better performance with caching
 
   // Modal
   const [showModal, setShowModal] = useState(false);
@@ -40,28 +44,36 @@ const Events = () => {
   const [sortOrder, setSortOrder] = useState("newest"); // newest or oldest
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch events
-  const fetchEvents = async () => {
-    setLoading(true);
-    const { data, success, error } = await apiCall(API_ENDPOINTS.EVENTS);
-    if (success) setEvents(data);
-    else {
-      setMessage(`❌ Failed to load events: ${error}`);
+  // Fetch categories using cached hook
+  const { categories, loading: categoriesLoading } = useCategoriesCached();
+
+  // Fetch events using cached hook with pagination
+  const { 
+    events, 
+    total: totalEvents,
+    loading: eventsLoading,
+    error: eventsError,
+    refetch: refetchEvents 
+  } = useEventsPaginatedCached({
+    page: currentPage,
+    pageSize: itemsPerPage,
+    categoryId: filterCategory || null,
+    status: filterStatus ? parseInt(filterStatus) : null,
+    enabled: true,
+  });
+
+  // Manual refetch function for actions (approve, delete, etc.)
+  const fetchEvents = async (isRefresh = false) => {
+    await refetchEvents();
+  };
+
+  // Set error message if events fail to load
+  useEffect(() => {
+    if (eventsError) {
+      setMessage(`❌ Failed to load events: ${eventsError}`);
       setMessageType("error");
     }
-    setLoading(false);
-  };
-
-  // Fetch categories
-  const fetchCategories = async () => {
-    const { data, success } = await publicApiCall(API_ENDPOINTS.CATEGORIES);
-    if (success) setCategories(data);
-  };
-
-  useEffect(() => {
-    fetchEvents();
-    fetchCategories();
-  }, []);
+  }, [eventsError]);
 
   // Pagination helpers
   const filteredEvents = events
@@ -113,49 +125,103 @@ const Events = () => {
 
   // Event Actions
   const handleApprove = async (eventId) => {
-    setLoading(true);
-    const { success } = await apiCall(
-      `http://127.0.0.1:8000/api/climate/event/${eventId}/approve`,
-      { method: "PATCH" }
-    );
-    if (success) {
-      setMessage("✅ Event approved!");
-      setMessageType("success");
-      fetchEvents();
-    } else setMessage("❌ Failed to approve");
-    setLoading(false);
+    setLoadingActions((prev) => ({ ...prev, [`approve-${eventId}`]: true }));
+    setMessage(null);
+    setMessageType(null);
+    
+    try {
+      const { success, error } = await apiCall(
+        API_ENDPOINTS.EVENT_APPROVE(eventId),
+        { method: "PATCH" }
+      );
+      if (success) {
+        setMessage("✅ Event approved!");
+        setMessageType("success");
+        // Invalidate cache to refresh data
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        await refetchEvents();
+      } else {
+        setMessage(`❌ Failed to approve: ${error || "Unknown error"}`);
+        setMessageType("error");
+      }
+    } catch (err) {
+      setMessage(`❌ Error: ${err.message}`);
+      setMessageType("error");
+    } finally {
+      setLoadingActions((prev) => ({ ...prev, [`approve-${eventId}`]: false }));
+    }
   };
 
   const handleDelete = async (eventId) => {
     if (!window.confirm("Delete this event?")) return;
-    setLoading(true);
-    const { success } = await apiCall(
-      `http://127.0.0.1:8000/api/climate/event/${eventId}`,
-      { method: "DELETE" }
-    );
-    if (success) {
-      setMessage("🗑 Event deleted!");
-      setMessageType("success");
-      fetchEvents();
-    } else setMessage("❌ Failed to delete");
-    setLoading(false);
+    
+    setLoadingActions((prev) => ({ ...prev, [`delete-${eventId}`]: true }));
+    setMessage(null);
+    setMessageType(null);
+    
+    try {
+      const { success, error } = await apiCall(
+        API_ENDPOINTS.EVENT_BY_ID(eventId),
+        { method: "DELETE" }
+      );
+      if (success) {
+        setMessage("🗑 Event deleted!");
+        setMessageType("success");
+        // Invalidate cache to refresh data
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        await refetchEvents();
+      } else {
+        setMessage(`❌ Failed to delete: ${error || "Unknown error"}`);
+        setMessageType("error");
+      }
+    } catch (err) {
+      setMessage(`❌ Error: ${err.message}`);
+      setMessageType("error");
+    } finally {
+      setLoadingActions((prev) => ({ ...prev, [`delete-${eventId}`]: false }));
+    }
   };
 
   const handleToggleFeatured = async (eventId, isFeatured) => {
-    setLoading(true);
-    const { success } = await apiCall(
-      `http://127.0.0.1:8000/api/climate/event/${eventId}/feature`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ is_featured: isFeatured }),
+    const previousEvent = currentEvent && currentEvent.event_id === eventId 
+      ? { ...currentEvent } 
+      : null;
+
+    // Show success message immediately
+    setMessage(isFeatured ? "⭐ Marked Featured" : "❌ Removed Featured");
+    setMessageType("success");
+
+    // Set loading state for this specific action
+    setLoadingActions((prev) => ({ ...prev, [`feature-${eventId}`]: true }));
+
+    // Make API call
+    try {
+      const { success, error } = await apiCall(
+        API_ENDPOINTS.EVENT_FEATURE(eventId),
+        {
+          method: "PATCH",
+          body: JSON.stringify({ is_featured: isFeatured }),
+        }
+      );
+      
+      if (success) {
+        // Invalidate cache to refresh data
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        await refetchEvents();
+        // Update current event if being viewed
+        if (previousEvent) {
+          setCurrentEvent({ ...previousEvent, is_featured: isFeatured });
+        }
+      } else {
+        setMessage(`❌ Failed to update: ${error || "Unknown error"}`);
+        setMessageType("error");
       }
-    );
-    if (success) {
-      setMessage(isFeatured ? "⭐ Marked Featured" : "❌ Removed Featured");
-      setMessageType("success");
-      fetchEvents();
-    } else setMessage("❌ Failed to update");
-    setLoading(false);
+    } catch (err) {
+      setMessage(`❌ Error: ${err.message}`);
+      setMessageType("error");
+    } finally {
+      setLoadingActions((prev) => ({ ...prev, [`feature-${eventId}`]: false }));
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -191,8 +257,8 @@ const Events = () => {
 
       const url =
         modalMode === "add"
-          ? "http://127.0.0.1:8000/api/climate/event/add"
-          : `http://127.0.0.1:8000/api/climate/event/${currentEvent.event_id}`;
+          ? API_ENDPOINTS.EVENT_ADD
+          : API_ENDPOINTS.EVENT_BY_ID(currentEvent.event_id);
 
       const { success, error } = await apiCallFormData(url, formDataToSend);
       if (success) {
@@ -202,7 +268,7 @@ const Events = () => {
             : "✅ Event updated successfully!"
         );
         setMessageType("success");
-        fetchEvents();
+        fetchEvents(true); // Refresh in background
         handleClose();
       } else {
         setMessage(`❌ Error: ${error}`);
@@ -297,12 +363,23 @@ const Events = () => {
         {/* Events Table */}
         <Card className="admin-card p-3">
           <h5>Events ({filteredEvents.length})</h5>
-          {loading ? (
-            <div className="text-center p-4">Loading...</div>
+          {eventsLoading ? (
+            <div className="text-center p-4">
+              <Spinner animation="border" role="status" className="me-2">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+              <span>Loading events...</span>
+            </div>
           ) : paginatedEvents.length === 0 ? (
             <p className="text-center">No events found.</p>
           ) : (
             <>
+              {eventsLoading && (
+                <div className="text-center py-2">
+                  <Spinner animation="border" size="sm" className="me-2" />
+                  <small className="text-muted">Refreshing...</small>
+                </div>
+              )}
               <div className="table-responsive">
                 <table className="table table-hover">
                   <thead>
@@ -369,8 +446,13 @@ const Events = () => {
                                 onClick={() =>
                                   handleApprove(event.event_id)
                                 }
+                                disabled={loadingActions[`approve-${event.event_id}`]}
                               >
-                                <FaCheck />
+                                {loadingActions[`approve-${event.event_id}`] ? (
+                                  <Spinner animation="border" size="sm" className="me-1" />
+                                ) : (
+                                  <FaCheck />
+                                )}
                               </Button>
                             )}
                             <Button
@@ -382,15 +464,25 @@ const Events = () => {
                                   !event.is_featured
                                 )
                               }
+                              disabled={loadingActions[`feature-${event.event_id}`]}
                             >
-                              <FaStar />
+                              {loadingActions[`feature-${event.event_id}`] ? (
+                                <Spinner animation="border" size="sm" className="me-1" />
+                              ) : (
+                                <FaStar />
+                              )}
                             </Button>
                             <Button
                               size="sm"
                               variant="outline-danger"
                               onClick={() => handleDelete(event.event_id)}
+                              disabled={loadingActions[`delete-${event.event_id}`]}
                             >
-                              <FaTrash />
+                              {loadingActions[`delete-${event.event_id}`] ? (
+                                <Spinner animation="border" size="sm" className="me-1" />
+                              ) : (
+                                <FaTrash />
+                              )}
                             </Button>
                           </div>
                         </td>

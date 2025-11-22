@@ -49,7 +49,9 @@ const Contacts = () => {
       }
 
       const data = await res.json();
-      console.log("Response:", data);
+      if (import.meta.env.DEV) {
+        console.log("Response:", data);
+      }
 
       toast.success("Message sent successfully!");
 
@@ -61,7 +63,9 @@ const Contacts = () => {
       });
 
     } catch (err) {
-      console.error(err);
+      if (import.meta.env.DEV) {
+        console.error(err);
+      }
       toast.error("Something went wrong 😢");
     }
   };

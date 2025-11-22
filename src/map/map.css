@@ -132,3 +132,64 @@
     transform: scale(1);
   }
 }
+
+/* --- CUSTOM CATEGORY MARKERS --- */
+.custom-category-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-category-marker div {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.custom-category-marker div:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  z-index: 1000;
+}
+
+/* --- MARKER CLUSTER STYLES --- */
+.marker-cluster-custom {
+  background: transparent !important;
+  border: none !important;
+}
+
+.marker-cluster-custom div {
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.marker-cluster-custom div:hover {
+  transform: scale(1.1);
+}
+
+/* Ensure popups are above other elements */
+.leaflet-popup {
+  z-index: 1001;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.leaflet-popup-content strong {
+  color: #1c232b;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.leaflet-popup-content small {
+  color: #666;
+  display: block;
+  margin-bottom: 4px;
+}

@@ -30,11 +30,15 @@ export async function loadRegionalDistrictsGeoJSON() {
     })
     .then(data => {
       geojsonCache = data;
-      console.log(`[BC Boundaries] Loaded ${data.features?.length || 0} regional districts`);
+      if (import.meta.env.DEV) {
+        console.log(`[BC Boundaries] Loaded ${data.features?.length || 0} regional districts`);
+      }
       return data;
     })
     .catch(error => {
-      console.error('[BC Boundaries] Error loading GeoJSON:', error);
+      if (import.meta.env.DEV) {
+        console.error('[BC Boundaries] Error loading GeoJSON:', error);
+      }
       loadingPromise = null; // Reset on error so we can retry
       throw error;
     });

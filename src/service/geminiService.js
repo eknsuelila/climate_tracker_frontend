@@ -24,7 +24,9 @@ export async function generateAnalyticsSummary(region, events, severity) {
     const response = await result.response;
     return response.text();
   } catch (error) {
-    console.error("Gemini summary generation failed:", error);
+    if (import.meta.env.DEV) {
+      console.error("Gemini summary generation failed:", error);
+    }
     return "Unable to generate summary at this time.";
   }
 }

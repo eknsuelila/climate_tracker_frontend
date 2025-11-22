@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_ENDPOINTS } from "../service/api.js";
 import "./AboutUs.css";
 
 export default function AboutUs() {
@@ -6,7 +7,7 @@ export default function AboutUs() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/about") // FastAPI endpoint
+    fetch(API_ENDPOINTS.ABOUT) // FastAPI endpoint
       .then((res) => res.json())
       .then((data) => {
         setStats(data);

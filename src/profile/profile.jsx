@@ -33,7 +33,9 @@ const Profile = () => {
         const data = await res.json();
         setUser(data);
       } catch (err) {
-        console.error(err);
+        if (import.meta.env.DEV) {
+          console.error(err);
+        }
         setError(err.message);
       } finally {
         setLoading(false);
