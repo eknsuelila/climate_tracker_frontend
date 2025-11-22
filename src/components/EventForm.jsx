@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Alert } from "react-bootstrap";
-import { API_ENDPOINTS, apiCallFormData, publicApiCall } from "../service/api.js";
+import { API_ENDPOINTS, apiCallFormData } from "../service/api.js";
+import { useCategoriesCached } from "../hooks/useCategoriesCached.js";
 
 const EventForm = ({
   initialData = null,
@@ -29,24 +30,19 @@ const EventForm = ({
     imageFiles: null,
   });
 
-  const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
 
-  // Fetch categories
+  // Fetch categories using cached hook
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategoriesCached();
+
+  // Set error message if categories fail to load
   useEffect(() => {
-    const fetchCategories = async () => {
-      const { data, success, error } = await publicApiCall(API_ENDPOINTS.CATEGORIES);
-      if (success) {
-        setCategories(data);
-      } else {
-        console.error("Failed to fetch categories:", error);
-        setMessage(`Failed to load categories: ${error}`);
-        setMessageType("error");
-      }
-    };
-    fetchCategories();
-  }, []);
+    if (categoriesError) {
+      setMessage(`Failed to load categories: ${categoriesError}`);
+      setMessageType("error");
+    }
+  }, [categoriesError]);
 
   // Populate data if editing
   useEffect(() => {

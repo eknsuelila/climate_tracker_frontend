@@ -36,7 +36,9 @@ const AdminContacts = () => {
     const { data, success } = await apiCall(API_ENDPOINTS.CONTACT);
 
     if (success) {
-      const sorted = data.sort(
+      // Handle paginated response: data.items contains the array, or data itself if it's an array
+      const contactsArray = Array.isArray(data) ? data : (data.items || []);
+      const sorted = contactsArray.sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
 
@@ -44,6 +46,8 @@ const AdminContacts = () => {
       setFilteredContacts(sorted);
     } else {
       toast.error("❌ Failed to fetch contacts");
+      setContacts([]);
+      setFilteredContacts([]);
     }
     setLoading(false);
   };

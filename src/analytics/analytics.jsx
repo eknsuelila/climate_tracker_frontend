@@ -37,7 +37,9 @@ const Analytics = () => {
           setRegions(data);
         }
       } catch (err) {
-        console.error("Error fetching regions:", err);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching regions:", err);
+        }
       }
     };
     fetchRegions();
@@ -58,7 +60,9 @@ const Analytics = () => {
         }));
         setEventData(formattedData);
       } catch (error) {
-        console.error("Error fetching event data:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching event data:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -77,7 +81,9 @@ const Analytics = () => {
         const formatted = Object.entries(data).map(([name, value]) => ({ name, value }));
         setImpactData(formatted);
       } catch (err) {
-        console.error("Error fetching severity data:", err);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching severity data:", err);
+        }
       }
     };
     fetchSeverityData();
@@ -92,7 +98,9 @@ const Analytics = () => {
         const summary = await generateAnalyticsSummary(selectedRegion, eventData, impactData);
         setAiSummary(summary);
       } catch (err) {
-        console.error("Gemini summary error:", err);
+        if (import.meta.env.DEV) {
+          console.error("Gemini summary error:", err);
+        }
         setAiSummary("AI summary unavailable.");
       } finally {
         setAiLoading(false);

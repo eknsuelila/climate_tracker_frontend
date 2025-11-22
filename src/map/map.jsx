@@ -5,9 +5,14 @@ import "./map.css";
 
 const Map = () => {
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const [events, setEvents] = useState([]);
 
   const handleRegionSelect = (regionName) => {
     setSelectedRegion(regionName);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedRegion(null);
   };
 
   return (
@@ -21,8 +26,16 @@ const Map = () => {
       </div>
 
       <div style={{ position: "relative", width: "100%", height: "calc(100vh - 200px)", minHeight: "600px" }}>
-        <MapEnhanced onRegionSelect={handleRegionSelect} selectedRegion={selectedRegion} />
-        <ClimateStatsPanel region={selectedRegion} />
+        <MapEnhanced 
+          onRegionSelect={handleRegionSelect} 
+          selectedRegion={selectedRegion}
+          onEventsUpdate={setEvents}
+        />
+        <ClimateStatsPanel 
+          region={selectedRegion} 
+          onClose={handleClosePanel}
+          events={events}
+        />
       </div>
     </div>
   );
