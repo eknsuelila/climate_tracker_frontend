@@ -283,8 +283,8 @@ const Events = () => {
   };
 
   return (
-    <div className="admin-page">
-      <Container className="admin-main">
+    <>
+      <Container>
         {/* Header */}
         <Row className="mb-4">
           <Col>
@@ -554,7 +554,7 @@ const Events = () => {
           <p><strong>Featured:</strong> {currentEvent?.is_featured ? "Yes" : "No"}</p>
         </Modal.Body>
       </Modal>
-    </div>
+    </>
   );
 };
 

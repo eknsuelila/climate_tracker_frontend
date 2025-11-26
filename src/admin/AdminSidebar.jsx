@@ -1,9 +1,9 @@
 import React from "react";
 import { Button } from "react-bootstrap";
-import { FaFolder, FaClipboardCheck, FaUsers, FaCog, FaSignOutAlt, FaMailBulk, FaMailchimp, FaTextHeight } from "react-icons/fa";
+import { FaFolder, FaClipboardCheck, FaUsers, FaCog, FaSignOutAlt, FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./admin.css";
-import { FaMessage, FaRegMessage, FaSignalMessenger } from "react-icons/fa6";
+import { FaMessage } from "react-icons/fa6";
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -22,6 +22,9 @@ const AdminSidebar = () => {
       <h2 className="sidebar-title">Admin Panel</h2>
 
       <div className="sidebar-menu">
+        <Button className="sidebar-btn" onClick={() => navigate("/")}>
+          <FaHome className="me-2" /> Home
+        </Button>
         <Button className="sidebar-btn" onClick={() => navigate("/admin/category")}>
           <FaFolder className="me-2" /> Category
         </Button>

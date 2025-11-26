@@ -1,12 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "./profile.css";
 import { NavLink } from "react-router-dom";
 import { API_ENDPOINTS } from "../service/api.js";
+import { useAuth } from "../service/auth.jsx";
+import { useEventsAllCached } from "../hooks/useEventsCached.js";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { user: authUser } = useAuth();
+  
+  // Fetch all events to filter by user
+  const { events: allEvents, loading: eventsLoading } = useEventsAllCached({
+    enabled: !!authUser?.email,
+    status: null // Get all events regardless of status
+  });
+
+  // Filter events by current user and calculate statistics
+  const userEvents = useMemo(() => {
+    if (!authUser?.email || !allEvents) return [];
+    return allEvents.filter(event => 
+      event.uploaded_by === authUser.email || event.uploaded_by_user === authUser.email
+    );
+  }, [allEvents, authUser?.email]);
+
+  const userStats = useMemo(() => {
+    const totalEvents = userEvents.length;
+    const approvedEvents = userEvents.filter(event => event.status === 1).length;
+    const contributionsPercentage = totalEvents > 0 
+      ? Math.round((approvedEvents / totalEvents) * 100) 
+      : 0;
+    
+    return {
+      totalEvents,
+      approvedEvents,
+      contributionsPercentage
+    };
+  }, [userEvents]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,7 +76,7 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  if (loading) return <div className="profile-page"><h3>Loading profile...</h3></div>;
+  if (loading || eventsLoading) return <div className="profile-page"><h3>Loading profile...</h3></div>;
   if (error) return <div className="profile-page error"><p>{error}</p></div>;
 
   return (
@@ -88,8 +119,8 @@ const Profile = () => {
           <div className="stats-section">
             <h3>Activity Overview</h3>
             <ul>
-              <li><strong>Events:</strong> {user.events || 0}</li>
-              <li><strong>Contributions:</strong> {user.contributions || 0}</li>
+              <li><strong>Events:</strong> {userStats.totalEvents}</li>
+              <li><strong>Contributions:</strong> {userStats.contributionsPercentage}% ({userStats.approvedEvents} approved out of {userStats.totalEvents} submitted)</li>
             </ul>
           </div>
 

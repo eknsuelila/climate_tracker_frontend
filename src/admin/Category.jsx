@@ -3,7 +3,9 @@ import { Container, Row, Col, Card, Button, Modal, Badge, Form } from "react-boo
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS, apiCall } from "../service/api.js";
+import { useCategoriesCached } from "../hooks/useCategoriesCached.js";
 import "./admin.css";
 
 const Category = () => {
@@ -24,9 +26,10 @@ const Category = () => {
     status: 1,
   });
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state for form operations
 
   // Fetch categories using cached hook
-  const { categories, loading, error: categoriesError, refetch: refetchCategories } = useCategoriesCached();
+  const { categories, loading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategoriesCached();
 
   // Manual refetch function for actions (create, update, delete)
   const fetchCategories = async () => {
@@ -184,8 +187,8 @@ const Category = () => {
   };
 
   return (
-    <div className="admin-page">
-      <Container className="admin-main">
+    <>
+      <Container>
         {/* Header */}
         <Row className="mb-4">
           <Col>
@@ -196,7 +199,7 @@ const Category = () => {
                 <Button
                   className="login-btn mt-2"
                   onClick={() => handleShow("add")}
-                  disabled={loading}
+                  disabled={categoriesLoading}
                 >
                   <FaPlus /> Add New Category
                 </Button>
@@ -267,7 +270,7 @@ const Category = () => {
                 </h5>
               </Card.Header>
               <Card.Body>
-                {loading ? (
+                {categoriesLoading ? (
                   <div className="text-center p-4">
                     <div className="spinner-border" role="status">
                       <span className="visually-hidden">Loading...</span>
@@ -397,7 +400,7 @@ const Category = () => {
         theme="colored"
         transition={Bounce}
       />
-    </div>
+    </>
   );
 };
 
