@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_ENDPOINTS } from "../service/api.js";
 import "./PasswordReset.css";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -26,7 +27,7 @@ const PasswordReset = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/climate/auth/reset_password", {
+      const response = await fetch(API_ENDPOINTS.RESET_PASSWORD, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

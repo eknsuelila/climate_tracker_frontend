@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
-import { apiCall } from '../service/api.js';
+import { apiCall, API_ENDPOINTS } from '../service/api.js';
 import './timeline.css';
 
 const MotionDiv = motion.div;
-const API_BASE_URL = 'http://127.0.0.1:8000';
 
 // Slideshow component for event images
 const ImageSlideshow = ({ images, eventTitle }) => {
@@ -115,11 +114,14 @@ const TimelinePage = () => {
     setError(null);
     
     try {
-      const { data, success, error: apiError } = await apiCall('http://127.0.0.1:8000/api/climate/event/');
+      const { data, success, error: apiError } = await apiCall(API_ENDPOINTS.EVENTS);
       
       if (success && data) {
+        // Handle paginated response: data.items contains the array, or data itself if it's an array
+        const eventsArray = Array.isArray(data) ? data : (data.items || []);
+        
         // Filter for approved events (status = 1) and map to timeline format
-        const approvedEvents = data
+        const approvedEvents = eventsArray
           .filter(event => event.status === 1)
           .map(event => {
             // Get all image URLs and randomize them
@@ -131,7 +133,9 @@ const TimelinePage = () => {
                     // Otherwise, prepend API base URL for local images
                     return url.startsWith('http://') || url.startsWith('https://')
                       ? url
-                      : `${API_BASE_URL}${url}`;
+                      : url.startsWith('/')
+                      ? `${import.meta.env.VITE_API_BASE_URL?.replace('/api/climate', '') || 'http://127.0.0.1:8000'}${url}`
+                      : url;
                   })
                   .sort(() => Math.random() - 0.5) // Randomize order
               : [];
@@ -536,39 +540,6 @@ const TimelinePage = () => {
                       </MotionDiv>
                     )}
 
-                    {/* Call to Action */}
-                    {activeEvent.source && (
-                      <MotionDiv
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.7 }}
-                      >
-                        <a 
-                          href={activeEvent.source} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{
-                            display: 'block',
-                            textAlign: 'center',
-                            padding: '14px 24px',
-                            background: 'linear-gradient(135deg, #3ebfff 0%, #30a6e5 100%)',
-                            color: 'white',
-                            textDecoration: 'none',
-                            borderRadius: '12px',
-                            fontWeight: '600',
-                            fontSize: '0.9em',
-                            boxShadow: '0 8px 24px rgba(62,191,255,0.4), 0 4px 12px rgba(62,191,255,0.3)',
-                            transition: 'all 0.3s ease',
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          <span style={{ position: 'relative', zIndex: 1 }}>
-                            Read Full Article →
-                          </span>
-                        </a>
-                      </MotionDiv>
-                    )}
                   </div>
 
                 </div>

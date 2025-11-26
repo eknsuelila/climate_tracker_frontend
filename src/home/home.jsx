@@ -15,7 +15,9 @@ const Home = () => {
         const data = await response.json();
         setFeaturedEvents(data);
       } catch (error) {
-        console.error("Error fetching featured events:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching featured events:", error);
+        }
       } finally {
         setLoading(false);
       }

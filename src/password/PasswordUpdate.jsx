@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../service/api.js";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./PasswordReset.css";
@@ -44,7 +45,7 @@ const PasswordUpdate = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/climate/auth/update_password", {
+      const response = await fetch(API_ENDPOINTS.UPDATE_PASSWORD, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, new_password: password }),

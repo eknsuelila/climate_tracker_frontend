@@ -1,10 +1,91 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { API_ENDPOINTS, apiCall } from "../service/api.js";
 import "./ClimateStatsPanel.css";
 
-const ClimateStatsPanel = ({ region }) => {
+const ClimateStatsPanel = ({ region, onClose, events = [] }) => {
   const [activeTab, setActiveTab] = useState("historical"); // "historical", "projections", "air-quality"
+  
+  // Region ID to region name mapping (from backend config)
+  const REGION_ID_TO_NAME = {
+    "100": "Northern BC",
+    "101": "Thompson-Okanagan",
+    "102": "Lower Mainland",
+    "103": "Vancouver Island & Coast",
+    "104": "Kootenay/Columbia"
+  };
+  
+  const IS_DEV = import.meta.env.DEV;
+  
+  // Count events by region (all events with valid coordinates for that region)
+  const eventCountByRegion = useMemo(() => {
+    if (!region) {
+      if (IS_DEV) {
+        console.log(`[ClimateStatsPanel] No region selected`);
+      }
+      return 0;
+    }
+    if (!events || events.length === 0) {
+      if (IS_DEV) {
+        console.log(`[ClimateStatsPanel] No events available. Region: ${region}`);
+      }
+      return 0;
+    }
+    
+    // Count all events in the selected region with valid coordinates
+    const matchingEvents = events.filter(event => {
+      if (!event) return false;
+      
+      // Check if event has region - it might be stored as ID or name
+      const eventRegion = event?.region;
+      if (!eventRegion) return false;
+      
+      // Handle both region ID (e.g., "100") and region name (e.g., "Northern BC")
+      let eventRegionName = eventRegion;
+      if (REGION_ID_TO_NAME[eventRegion]) {
+        // If it's a region ID, map it to region name
+        eventRegionName = REGION_ID_TO_NAME[eventRegion];
+      }
+      
+      // Check if event region matches the selected region
+      if (eventRegionName !== region && eventRegion !== region) return false;
+      
+      // Must have valid coordinates
+      if (!event.lat || !event.lng) return false;
+      
+      // Include all events regardless of status (user wants total count per region)
+      return true;
+    });
+    
+    const count = matchingEvents.length;
+    
+    // Debug logging with region ID to name mapping
+    const availableRegions = [...new Set(events.map(e => e?.region).filter(Boolean))];
+      const mappedRegions = availableRegions.map(r => {
+        const name = REGION_ID_TO_NAME[r] || r;
+        return `${r} → ${name}`;
+      });
+      
+    if (IS_DEV) {
+      console.log(`[ClimateStatsPanel] Region: "${region}"`, {
+        totalEvents: events.length,
+        eventsInRegion: count,
+        eventsWithRegions: events.filter(e => e?.region).length,
+        availableRegions: availableRegions,
+        mappedRegions: mappedRegions,
+        sampleEventRegions: events.slice(0, 5).map(e => {
+          const r = e?.region;
+          return `${r} → ${REGION_ID_TO_NAME[r] || r}`;
+        })
+      });
+    }
+    
+    if (count === 0 && events.length > 0 && availableRegions.length > 0 && IS_DEV) {
+      console.warn(`[ClimateStatsPanel] ⚠️ No events found for region "${region}". Available regions (ID → Name):`, mappedRegions);
+    }
+    
+    return count;
+  }, [region, events]);
   
   // Historical data state
   const [climateData, setClimateData] = useState(null);
@@ -47,7 +128,9 @@ const ClimateStatsPanel = ({ region }) => {
         }
       } catch (err) {
         setHistoricalError(err.message || "An error occurred");
-        console.error("Error fetching climate data:", err);
+        if (IS_DEV) {
+          console.error("Error fetching climate data:", err);
+        }
       } finally {
         setHistoricalLoading(false);
       }
@@ -76,7 +159,9 @@ const ClimateStatsPanel = ({ region }) => {
         }
       } catch (err) {
         setProjectionsError(err.message || "An error occurred");
-        console.error("Error fetching projections:", err);
+        if (IS_DEV) {
+          console.error("Error fetching projections:", err);
+        }
       } finally {
         setProjectionsLoading(false);
       }
@@ -105,7 +190,9 @@ const ClimateStatsPanel = ({ region }) => {
         }
       } catch (err) {
         setAirQualityError(err.message || "An error occurred");
-        console.error("Error fetching air quality:", err);
+        if (IS_DEV) {
+          console.error("Error fetching air quality:", err);
+        }
       } finally {
         setAirQualityLoading(false);
       }
@@ -119,11 +206,7 @@ const ClimateStatsPanel = ({ region }) => {
   }, [region, activeTab]);
 
   if (!region) {
-    return (
-      <div className="climate-stats-panel closed">
-        <p>Select a region to view climate statistics</p>
-      </div>
-    );
+    return null; // Don't render panel when no region is selected
   }
 
   const loading = historicalLoading || projectionsLoading || airQualityLoading;
@@ -140,7 +223,19 @@ const ClimateStatsPanel = ({ region }) => {
   return (
     <div className="climate-stats-panel">
       <div className="panel-header">
-        <h3>{region}</h3>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h3>{region}</h3>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="close-button"
+              aria-label="Close panel"
+              title="Close panel"
+            >
+              ×
+            </button>
+          )}
+        </div>
         
         {/* Tabs */}
         <div className="tabs-container">
@@ -171,6 +266,7 @@ const ClimateStatsPanel = ({ region }) => {
           climateData={climateData}
           loading={historicalLoading}
           error={historicalError}
+          eventCountByRegion={eventCountByRegion}
         />
       )}
 
@@ -197,7 +293,7 @@ const ClimateStatsPanel = ({ region }) => {
 };
 
 // Historical Trends Component
-const HistoricalTab = ({ climateData, loading, error }) => {
+const HistoricalTab = ({ climateData, loading, error, eventCountByRegion = 0 }) => {
   if (loading && !climateData) {
     return <div className="loading-spinner">Loading historical data...</div>;
   }
@@ -210,23 +306,39 @@ const HistoricalTab = ({ climateData, loading, error }) => {
     return <div className="no-data">No historical data available</div>;
   }
 
-  const { historical, avg_temperature, total_precipitation, avg_snowfall, event_count, insights, cities } = climateData;
+  // Safely destructure with defaults to prevent errors
+  const { 
+    historical = [], 
+    avg_temperature = null, 
+    total_precipitation = null, 
+    avg_snowfall = null, 
+    event_count = 0, 
+    insights = [], 
+    cities = [],
+    source = null,
+    model = null,
+    data_range = null
+  } = climateData || {};
 
-  // Prepare chart data
-  const chartData = historical.map((entry) => ({
-    year: entry.year,
-    temperature: entry.temperature,
-    precipitation: entry.precipitation,
-    snowfall: entry.snowfall,
-  }));
+  // Prepare chart data - safely handle missing historical array
+  const chartData = Array.isArray(historical) 
+    ? historical
+        .filter(entry => entry && entry.year) // Filter out invalid entries
+        .map((entry) => ({
+          year: entry.year,
+          temperature: entry.temperature ?? null,
+          precipitation: entry.precipitation ?? null,
+          snowfall: entry.snowfall ?? null,
+        }))
+    : [];
 
   return (
     <>
       <div className="data-source">
         Source: {
-          climateData.source === "open_meteo_api" 
-            ? `Open-Meteo API${climateData.model ? ` (${climateData.model})` : ""}`
-            : climateData.source === "fallback_data"
+          source === "open_meteo_api" 
+            ? `Open-Meteo API${model ? ` (${model})` : ""}`
+            : source === "fallback_data"
             ? "Fallback Data"
             : "Unknown"
         }
@@ -250,7 +362,7 @@ const HistoricalTab = ({ climateData, loading, error }) => {
         )}
         <div className="stat-card">
           <div className="stat-label">Climate Events</div>
-          <div className="stat-value">{event_count || 0}</div>
+          <div className="stat-value">{eventCountByRegion ?? 0}</div>
         </div>
       </div>
 
@@ -321,10 +433,10 @@ const HistoricalTab = ({ climateData, loading, error }) => {
       )}
 
       {/* Data Range */}
-      {climateData.data_range && (
+      {data_range && data_range.start && data_range.end && (
         <div className="data-range">
           <small>
-            Data Range: {climateData.data_range.start} to {climateData.data_range.end}
+            Data Range: {data_range.start} to {data_range.end}
           </small>
         </div>
       )}

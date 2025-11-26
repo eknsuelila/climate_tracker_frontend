@@ -7,9 +7,8 @@ import { API_ENDPOINTS, apiCall } from "../service/api.js";
 import "./admin.css";
 
 const Category = () => {
-  const [categories, setCategories] = useState([]);
+  const queryClient = useQueryClient();
   const [filteredCategories, setFilteredCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   // Filter States
   const [statusFilter, setStatusFilter] = useState("All"); // All / Active / Deactivated
@@ -26,23 +25,20 @@ const Category = () => {
   });
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Fetch all categories on mount
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  // Fetch categories using cached hook
+  const { categories, loading, error: categoriesError, refetch: refetchCategories } = useCategoriesCached();
 
-  // Fetch from backend
+  // Manual refetch function for actions (create, update, delete)
   const fetchCategories = async () => {
-    setLoading(true);
-    const { data, success, error } = await apiCall(API_ENDPOINTS.CATEGORIES);
-    if (success) {
-      setCategories(data);
-      setFilteredCategories(data);
-    } else {
-      toast.error(`❌ Failed to fetch categories: ${error}`);
-    }
-    setLoading(false);
+    await refetchCategories();
   };
+
+  // Set error message if categories fail to load
+  useEffect(() => {
+    if (categoriesError) {
+      toast.error(`❌ Failed to fetch categories: ${categoriesError}`);
+    }
+  }, [categoriesError]);
 
   // Apply Filters + Sorting
   useEffect(() => {
@@ -122,7 +118,9 @@ const Category = () => {
             ? "✅ Category added successfully!"
             : "✅ Category updated successfully!"
         );
-        fetchCategories();
+        // Invalidate cache to refresh categories
+        queryClient.invalidateQueries({ queryKey: ['categories'] });
+        await fetchCategories();
         handleClose();
       } else {
         toast.error(`❌ Failed to save category: ${error}`);
@@ -144,7 +142,9 @@ const Category = () => {
 
       if (success) {
         toast.success("✅ Category deactivated successfully!");
-        fetchCategories();
+        // Invalidate cache to refresh categories
+        queryClient.invalidateQueries({ queryKey: ['categories'] });
+        await fetchCategories();
       } else {
         toast.error(`❌ Failed to delete category: ${error}`);
       }
