@@ -148,9 +148,9 @@ const Users = () => {
   };
 
   return (
-    <div className="admin-page">
+    <>
       <ToastContainer />
-      <Container className="admin-main">
+      <Container>
         <Row className="mb-4">
           <Col>
             <Card className="admin-card text-center p-4">
@@ -313,7 +313,7 @@ const Users = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   );
 };
 

@@ -151,10 +151,9 @@ const AdminContacts = () => {
   };
 
   return (
-    <div className="admin-page">
+    <>
       <ToastContainer />
-
-      <Container className="admin-main">
+      <Container>
         <Row className="mb-4">
           <Col>
             <Card className="admin-card text-center p-4">
@@ -346,7 +345,7 @@ const AdminContacts = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   );
 };
 

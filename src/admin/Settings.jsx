@@ -16,8 +16,7 @@ const Settings = () => {
   const handleSaveSystem = () => alert("System settings updated!");
 
   return (
-    <div className="admin-page" style={{ background: "linear-gradient(135deg, #1c232b 40%, #2b3947 100%)", minHeight: "100vh", paddingTop: "60px", paddingBottom: "40px" }}>
-      <Container>
+    <Container>
         {/* Header */}
         <Row className="mb-4">
           <Col>
@@ -133,8 +132,7 @@ const Settings = () => {
             </Card>
           </Col>
         </Row>
-      </Container>
-    </div>
+    </Container>
   );
 };
 
